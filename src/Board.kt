@@ -27,23 +27,32 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
         get() = (0..(rows - 1)).map { row(it) }
     val columnsList: List<List<T>>
         get() = (0..(columns - 1)).map { column(it) }
+    val size = rows * columns
 
     constructor(rows: Int, columns: Int, init: T) : this(rows, columns, (1..rows * columns).map { init })
 
-    operator fun get(x: Int, y: Int): T {
-        if (inBounds(x, y))
-            return values[y * columns + x]
-        else
-            throw IndexOutOfBoundsException()
-    }
+    fun offset(x: Int, y: Int) = y * columns + x
 
     fun inBounds(x: Int, y: Int) =
             x >= 0 && x < columns && y >= 0 && y < rows
 
+    operator fun get(offset: Int) = values[offset]
 
-    operator fun set(x: Int, y: Int, b: T) {
-        if (x >= 0 && x < columns && y >= 0 && y < rows) {
-            values[y * columns + x] = b
+    operator fun set(offset: Int, value: T) {
+        values[offset] = value
+    }
+
+    operator fun get(x: Int, y: Int): T {
+        if (inBounds(x, y))
+            return values[offset(x, y)]
+        else
+            throw IndexOutOfBoundsException()
+    }
+
+
+    operator fun set(x: Int, y: Int, value: T) {
+        if (inBounds(x, y)) {
+            values[offset(x, y)] = value
         } else
             throw IndexOutOfBoundsException()
     }
@@ -82,12 +91,69 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
         val up = Pair(x, y - 1)
         val down = Pair(x, y + 1)
 
-        val neighbors = listOf(up, left, right, down).filter { inBounds(it.first, it.second) }
+        val neighbors = listOf(up, right, down, left).filter { inBounds(it.first, it.second) }
 
         return neighbors.map { PositionValue(it, get(it.first, it.second)) }
     }
 
-    fun depthFirst(x: Int, y: Int, visitor: (PositionValue<T>) -> Boolean) {
+    fun neighbors8(x: Int, y: Int): List<PositionValue<T>> {
+        val left = Pair(x - 1, y)
+        val right = Pair(x + 1, y)
+        val up = Pair(x, y - 1)
+        val down = Pair(x, y + 1)
+
+        val upLeft = Pair(x - 1, y - 1)
+        val upRight = Pair(x + 1, y - 1)
+        val downLeft = Pair(x - 1, y + 1)
+        val downRight = Pair(x + 1, y + 1)
+
+        val neighbors = listOf(up, upRight, right, downRight, down,
+                downLeft, left, upLeft).filter { inBounds(it.first, it.second) }
+
+        return neighbors.map { PositionValue(it, get(it.first, it.second)) }
+    }
+
+    fun neighborsNW(x: Int, y: Int): List<PositionValue<T>> {
+        val left = Pair(x - 1, y)
+        val up = Pair(x, y - 1)
+        val upLeft = Pair(x - 1, y - 1)
+
+        val neighbors = listOf(left, upLeft, up).filter { inBounds(it.first, it.second) }
+
+        return neighbors.map { PositionValue(it, get(it.first, it.second)) }
+    }
+
+    fun neighborsNE(x: Int, y: Int): List<PositionValue<T>> {
+        val right = Pair(x + 1, y)
+        val up = Pair(x, y - 1)
+        val upRight = Pair(x + 1, y - 1)
+
+        val neighbors = listOf(up, upRight, right).filter { inBounds(it.first, it.second) }
+
+        return neighbors.map { PositionValue(it, get(it.first, it.second)) }
+    }
+
+    fun neighborsSE(x: Int, y: Int): List<PositionValue<T>> {
+        val right = Pair(x + 1, y)
+        val down = Pair(x, y + 1)
+        val downRight = Pair(x + 1, y + 1)
+
+        val neighbors = listOf(right, downRight, down).filter { inBounds(it.first, it.second) }
+
+        return neighbors.map { PositionValue(it, get(it.first, it.second)) }
+    }
+
+    fun neighborsSW(x: Int, y: Int): List<PositionValue<T>> {
+        val left = Pair(x - 1, y)
+        val down = Pair(x, y + 1)
+        val downLeft = Pair(x - 1, y + 1)
+
+        val neighbors = listOf(down, downLeft, left).filter { inBounds(it.first, it.second) }
+
+        return neighbors.map { PositionValue(it, get(it.first, it.second)) }
+    }
+
+    inline fun depthFirst(x: Int, y: Int, visitor: (PositionValue<T>) -> Boolean) {
         val stack = Stack<PositionValue<T>>()
         val visited = mutableSetOf<PositionValue<T>>()
         stack.push(PositionValue(x, y, get(x, y)))
@@ -107,5 +173,6 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
         }
     }
 
-    override fun toString(): String = rowsList.joinToString(separator = ",  ", prefix = "[ ", postfix = " ]", transform = { it.joinToString() })
+    override fun toString(): String =
+            rowsList.joinToString(separator = ",  ", prefix = "[ ", postfix = " ]", transform = { it.joinToString() })
 }

@@ -21533,7 +21533,7 @@
       if (node.nodeType === Node.ELEMENT_NODE) {
         return Kotlin.isType(tmp$0 = node, Element) ? tmp$0 : Kotlin.throwCCE();
       } else {
-        throw new Kotlin.IllegalArgumentException("Tree is not an Element as expected but is " + Kotlin.toString(node));
+        throw new Kotlin.IllegalArgumentException("Node is not an Element as expected but is " + Kotlin.toString(node));
       }
     }
   }, size:{get:function() {

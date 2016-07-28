@@ -7,15 +7,18 @@ import kotlin.dom.onClick
 class Nurikabe() {
     private val rowsInput = document.getElementById("rows") as HTMLInputElement
     private val columnsInput = document.getElementById("columns") as HTMLInputElement
-
-    val table = document.getElementById("board") as HTMLTableElement
+    private val solve = document.getElementById("solve") as HTMLButtonElement
+    private val next = document.getElementById("next") as HTMLButtonElement
+    private val update = document.getElementById("update") as HTMLButtonElement
+    private val fail = document.getElementById("notsolved") as HTMLParagraphElement
+    private val table = document.getElementById("board") as HTMLTableElement
     private var tbody = table.tBodies[0] as HTMLTableSectionElement
+
     val rows: Int
         get() = rowsInput.valueAsNumber.floor()
     val columns: Int
         get() = columnsInput.valueAsNumber.floor()
     var board = Board(rows, columns, 0)
-    private val next = document.getElementById("next") as HTMLButtonElement
 
     fun update() {
         board = Board(rows, columns, 0)
@@ -59,18 +62,22 @@ class Nurikabe() {
         table.ondblclick = { false }
         table.addEventListener("selectstart", { it.preventDefault() })
         table.oncontextmenu = { false }
-        document.getElementById("update").onClick { update() }
-        val fail = document.getElementById("notsolved") as HTMLParagraphElement
-        document.getElementById("solve").onClick {
+        update.onClick { update() }
+        update()
+
+        fun solve() {
             fail.style.visibility = "hidden"
-            val solution = board.solve()
+            val solution = Solver(board).solve()
             if (solution != null) {
                 board = solution
+                next.style.visibility = "visible"
                 refresh()
             } else {
+                next.style.visibility = "hidden"
                 fail.style.visibility = "visible"
             }
         }
-        update()
+        solve.onClick { solve() }
+        next.onClick { solve() }
     }
 }
