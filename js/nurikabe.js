@@ -32,6 +32,7 @@
       this.rows = rows;
       this.columns = columns;
       this.values_1itv7u$ = Kotlin.modules['stdlib'].kotlin.collections.toMutableList_mwto7b$(list);
+      this.size = this.rows * this.columns;
     }, /** @lends _.Board.prototype */ {
       rowsList: {
         get: function () {
@@ -59,18 +60,27 @@
           return destination;
         }
       },
-      get_vux9f0$: function (x, y) {
-        if (this.inBounds_vux9f0$(x, y))
-          return this.values_1itv7u$.get_za3lpa$(y * this.columns + x);
-        else
-          throw new Kotlin.IndexOutOfBoundsException();
+      offset_vux9f0$: function (x, y) {
+        return y * this.columns + x;
       },
       inBounds_vux9f0$: function (x, y) {
         return x >= 0 && x < this.columns && y >= 0 && y < this.rows;
       },
-      set_qt1joh$: function (x, y, b) {
-        if (x >= 0 && x < this.columns && y >= 0 && y < this.rows) {
-          this.values_1itv7u$.set_vux3hl$(y * this.columns + x, b);
+      get_za3lpa$: function (offset) {
+        return this.values_1itv7u$.get_za3lpa$(offset);
+      },
+      set_vux3hl$: function (offset, value) {
+        this.values_1itv7u$.set_vux3hl$(offset, value);
+      },
+      get_vux9f0$: function (x, y) {
+        if (this.inBounds_vux9f0$(x, y))
+          return this.values_1itv7u$.get_za3lpa$(this.offset_vux9f0$(x, y));
+        else
+          throw new Kotlin.IndexOutOfBoundsException();
+      },
+      set_qt1joh$: function (x, y, value) {
+        if (this.inBounds_vux9f0$(x, y)) {
+          this.values_1itv7u$.set_vux3hl$(this.offset_vux9f0$(x, y), value);
         }
          else
           throw new Kotlin.IndexOutOfBoundsException();
@@ -111,7 +121,7 @@
         var right = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y);
         var up = new Kotlin.modules['stdlib'].kotlin.Pair(x, y - 1);
         var down = new Kotlin.modules['stdlib'].kotlin.Pair(x, y + 1);
-        var $receiver = Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([up, left, right, down]);
+        var $receiver = Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([up, right, down, left]);
         var destination = new Kotlin.ArrayList();
         var tmp$0;
         tmp$0 = $receiver.iterator();
@@ -131,7 +141,132 @@
         }
         return destination_0;
       },
-      depthFirst_j3dvhl$: function (x, y, visitor) {
+      neighbors8_vux9f0$: function (x, y) {
+        var left = new Kotlin.modules['stdlib'].kotlin.Pair(x - 1, y);
+        var right = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y);
+        var up = new Kotlin.modules['stdlib'].kotlin.Pair(x, y - 1);
+        var down = new Kotlin.modules['stdlib'].kotlin.Pair(x, y + 1);
+        var upLeft = new Kotlin.modules['stdlib'].kotlin.Pair(x - 1, y - 1);
+        var upRight = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y - 1);
+        var downLeft = new Kotlin.modules['stdlib'].kotlin.Pair(x - 1, y + 1);
+        var downRight = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y + 1);
+        var $receiver = Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([up, upRight, right, downRight, down, downLeft, left, upLeft]);
+        var destination = new Kotlin.ArrayList();
+        var tmp$0;
+        tmp$0 = $receiver.iterator();
+        while (tmp$0.hasNext()) {
+          var element = tmp$0.next();
+          if (this.inBounds_vux9f0$(element.first, element.second)) {
+            destination.add_za3rmp$(element);
+          }
+        }
+        var neighbors = destination;
+        var destination_0 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(neighbors, 10));
+        var tmp$1;
+        tmp$1 = neighbors.iterator();
+        while (tmp$1.hasNext()) {
+          var item = tmp$1.next();
+          destination_0.add_za3rmp$(new _.PositionValue(item, this.get_vux9f0$(item.first, item.second)));
+        }
+        return destination_0;
+      },
+      neighborsNW_vux9f0$: function (x, y) {
+        var left = new Kotlin.modules['stdlib'].kotlin.Pair(x - 1, y);
+        var up = new Kotlin.modules['stdlib'].kotlin.Pair(x, y - 1);
+        var upLeft = new Kotlin.modules['stdlib'].kotlin.Pair(x - 1, y - 1);
+        var $receiver = Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([left, upLeft, up]);
+        var destination = new Kotlin.ArrayList();
+        var tmp$0;
+        tmp$0 = $receiver.iterator();
+        while (tmp$0.hasNext()) {
+          var element = tmp$0.next();
+          if (this.inBounds_vux9f0$(element.first, element.second)) {
+            destination.add_za3rmp$(element);
+          }
+        }
+        var neighbors = destination;
+        var destination_0 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(neighbors, 10));
+        var tmp$1;
+        tmp$1 = neighbors.iterator();
+        while (tmp$1.hasNext()) {
+          var item = tmp$1.next();
+          destination_0.add_za3rmp$(new _.PositionValue(item, this.get_vux9f0$(item.first, item.second)));
+        }
+        return destination_0;
+      },
+      neighborsNE_vux9f0$: function (x, y) {
+        var right = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y);
+        var up = new Kotlin.modules['stdlib'].kotlin.Pair(x, y - 1);
+        var upRight = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y - 1);
+        var $receiver = Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([up, upRight, right]);
+        var destination = new Kotlin.ArrayList();
+        var tmp$0;
+        tmp$0 = $receiver.iterator();
+        while (tmp$0.hasNext()) {
+          var element = tmp$0.next();
+          if (this.inBounds_vux9f0$(element.first, element.second)) {
+            destination.add_za3rmp$(element);
+          }
+        }
+        var neighbors = destination;
+        var destination_0 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(neighbors, 10));
+        var tmp$1;
+        tmp$1 = neighbors.iterator();
+        while (tmp$1.hasNext()) {
+          var item = tmp$1.next();
+          destination_0.add_za3rmp$(new _.PositionValue(item, this.get_vux9f0$(item.first, item.second)));
+        }
+        return destination_0;
+      },
+      neighborsSE_vux9f0$: function (x, y) {
+        var right = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y);
+        var down = new Kotlin.modules['stdlib'].kotlin.Pair(x, y + 1);
+        var downRight = new Kotlin.modules['stdlib'].kotlin.Pair(x + 1, y + 1);
+        var $receiver = Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([right, downRight, down]);
+        var destination = new Kotlin.ArrayList();
+        var tmp$0;
+        tmp$0 = $receiver.iterator();
+        while (tmp$0.hasNext()) {
+          var element = tmp$0.next();
+          if (this.inBounds_vux9f0$(element.first, element.second)) {
+            destination.add_za3rmp$(element);
+          }
+        }
+        var neighbors = destination;
+        var destination_0 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(neighbors, 10));
+        var tmp$1;
+        tmp$1 = neighbors.iterator();
+        while (tmp$1.hasNext()) {
+          var item = tmp$1.next();
+          destination_0.add_za3rmp$(new _.PositionValue(item, this.get_vux9f0$(item.first, item.second)));
+        }
+        return destination_0;
+      },
+      neighborsSW_vux9f0$: function (x, y) {
+        var left = new Kotlin.modules['stdlib'].kotlin.Pair(x - 1, y);
+        var down = new Kotlin.modules['stdlib'].kotlin.Pair(x, y + 1);
+        var downLeft = new Kotlin.modules['stdlib'].kotlin.Pair(x - 1, y + 1);
+        var $receiver = Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([down, downLeft, left]);
+        var destination = new Kotlin.ArrayList();
+        var tmp$0;
+        tmp$0 = $receiver.iterator();
+        while (tmp$0.hasNext()) {
+          var element = tmp$0.next();
+          if (this.inBounds_vux9f0$(element.first, element.second)) {
+            destination.add_za3rmp$(element);
+          }
+        }
+        var neighbors = destination;
+        var destination_0 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(neighbors, 10));
+        var tmp$1;
+        tmp$1 = neighbors.iterator();
+        while (tmp$1.hasNext()) {
+          var item = tmp$1.next();
+          destination_0.add_za3rmp$(new _.PositionValue(item, this.get_vux9f0$(item.first, item.second)));
+        }
+        return destination_0;
+      },
+      depthFirst_j3dvhl$: Kotlin.defineInlineFunction('nurikabe.Board.depthFirst_j3dvhl$', function (x, y, visitor) {
         var stack = new _.Stack();
         var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
         stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, this.get_vux9f0$(x, y)));
@@ -153,7 +288,7 @@
             }
           }
         }
-      },
+      }),
       toString: function () {
         return Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$(this.rowsList, ',  ', '[ ', ' ]', void 0, void 0, _.Board.toString$f);
       }
@@ -206,28 +341,28 @@
       _.Board.call($this, rows, columns, destination);
       return $this;
     },
-    main_kand9s$f: function (it) {
-      Kotlin.println(it);
-    },
     main_kand9s$: function (args) {
       new _.Nurikabe();
-      _.Tree_init_p3fpvf$(1, Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([_.Tree_init_p3fpvf$(2, Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([_.Tree_init_za3rmp$(4), _.Tree_init_p3fpvf$(5, Kotlin.modules['stdlib'].kotlin.collections.listOf_9mqe4v$([_.Tree_init_za3rmp$(6), _.Tree_init_za3rmp$(7)]))])), _.Tree_init_za3rmp$(3)])).depthFirst_lm9z1s$(_.main_kand9s$f);
     },
     Nurikabe: Kotlin.createClass(null, function () {
-      var tmp$0, tmp$1, tmp$2, tmp$3, tmp$4, tmp$5;
+      var tmp$0, tmp$1, tmp$2, tmp$3, tmp$4, tmp$5, tmp$6, tmp$7;
       this.rowsInput_9llf0m$ = Kotlin.isType(tmp$0 = document.getElementById('rows'), HTMLInputElement) ? tmp$0 : Kotlin.throwCCE();
       this.columnsInput_v312bg$ = Kotlin.isType(tmp$1 = document.getElementById('columns'), HTMLInputElement) ? tmp$1 : Kotlin.throwCCE();
-      this.table = Kotlin.isType(tmp$2 = document.getElementById('board'), HTMLTableElement) ? tmp$2 : Kotlin.throwCCE();
-      this.tbody_u7vcpt$ = Kotlin.isType(tmp$3 = this.table.tBodies[0], HTMLTableSectionElement) ? tmp$3 : Kotlin.throwCCE();
+      this.solve_u86wag$ = Kotlin.isType(tmp$2 = document.getElementById('solve'), HTMLButtonElement) ? tmp$2 : Kotlin.throwCCE();
+      this.next_39onau$ = Kotlin.isType(tmp$3 = document.getElementById('next'), HTMLButtonElement) ? tmp$3 : Kotlin.throwCCE();
+      this.update_cozkyo$ = Kotlin.isType(tmp$4 = document.getElementById('update'), HTMLButtonElement) ? tmp$4 : Kotlin.throwCCE();
+      this.fail_39tuiz$ = Kotlin.isType(tmp$5 = document.getElementById('notsolved'), HTMLParagraphElement) ? tmp$5 : Kotlin.throwCCE();
+      this.table_u7w961$ = Kotlin.isType(tmp$6 = document.getElementById('board'), HTMLTableElement) ? tmp$6 : Kotlin.throwCCE();
+      this.tbody_u7vcpt$ = Kotlin.isType(tmp$7 = this.table_u7w961$.tBodies[0], HTMLTableSectionElement) ? tmp$7 : Kotlin.throwCCE();
       this.board = _.Board_init_qt1joh$(this.rows, this.columns, 0);
-      this.next_39onau$ = Kotlin.isType(tmp$4 = document.getElementById('next'), HTMLButtonElement) ? tmp$4 : Kotlin.throwCCE();
-      this.table.ondblclick = _.Nurikabe.Nurikabe$f;
-      this.table.addEventListener('selectstart', _.Nurikabe.Nurikabe$f_0);
-      this.table.oncontextmenu = _.Nurikabe.Nurikabe$f_1;
-      Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(document.getElementById('update'), void 0, _.Nurikabe.Nurikabe$f_2(this));
-      var fail = Kotlin.isType(tmp$5 = document.getElementById('notsolved'), HTMLParagraphElement) ? tmp$5 : Kotlin.throwCCE();
-      Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(document.getElementById('solve'), void 0, _.Nurikabe.Nurikabe$f_3(fail, this));
+      this.table_u7w961$.ondblclick = _.Nurikabe.Nurikabe$f;
+      this.table_u7w961$.addEventListener('selectstart', _.Nurikabe.Nurikabe$f_0);
+      this.table_u7w961$.oncontextmenu = _.Nurikabe.Nurikabe$f_1;
+      Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this.update_cozkyo$, void 0, _.Nurikabe.Nurikabe$f_2(this));
       this.update();
+      var solve = _.Nurikabe.Nurikabe$solve(this);
+      Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this.solve_u86wag$, void 0, _.Nurikabe.Nurikabe$f_3(solve));
+      Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this.next_39onau$, void 0, _.Nurikabe.Nurikabe$f_4(solve));
     }, /** @lends _.Nurikabe.prototype */ {
       rows: {
         get: function () {
@@ -243,7 +378,7 @@
         var tmp$0;
         this.board = _.Board_init_qt1joh$(this.rows, this.columns, 0);
         this.tbody_u7vcpt$.remove();
-        this.tbody_u7vcpt$ = Kotlin.isType(tmp$0 = this.table.createTBody(), HTMLTableSectionElement) ? tmp$0 : Kotlin.throwCCE();
+        this.tbody_u7vcpt$ = Kotlin.isType(tmp$0 = this.table_u7w961$.createTBody(), HTMLTableSectionElement) ? tmp$0 : Kotlin.throwCCE();
         var tmp$1;
         var index = 0;
         tmp$1 = this.board.rowsList.iterator();
@@ -321,18 +456,497 @@
           this$Nurikabe.update();
         };
       },
-      Nurikabe$f_3: function (closure$fail, this$Nurikabe) {
-        return function (it) {
-          closure$fail.style.visibility = 'hidden';
-          var solution = _.solve_3ucpiw$(this$Nurikabe.board);
+      Nurikabe$solve: function (this$Nurikabe) {
+        return function () {
+          this$Nurikabe.fail_39tuiz$.style.visibility = 'hidden';
+          var solution = (new _.Solver(this$Nurikabe.board)).solve();
           if (solution != null) {
             this$Nurikabe.board = solution;
+            this$Nurikabe.next_39onau$.style.visibility = 'visible';
             this$Nurikabe.refresh();
           }
            else {
-            closure$fail.style.visibility = 'visible';
+            this$Nurikabe.next_39onau$.style.visibility = 'hidden';
+            this$Nurikabe.fail_39tuiz$.style.visibility = 'visible';
           }
         };
+      },
+      Nurikabe$f_3: function (closure$solve) {
+        return function (it) {
+          closure$solve();
+        };
+      },
+      Nurikabe$f_4: function (closure$solve) {
+        return function (it) {
+          closure$solve();
+        };
+      }
+    }),
+    black: function ($receiver) {
+      var destination = new Kotlin.ArrayList();
+      var tmp$0;
+      tmp$0 = $receiver.iterator();
+      while (tmp$0.hasNext()) {
+        var element = tmp$0.next();
+        if (element.value === -1) {
+          destination.add_za3rmp$(element);
+        }
+      }
+      return destination;
+    },
+    connected$f: function (it) {
+      return it.value <= -1;
+    },
+    connected: function ($receiver) {
+      var c;
+      var blacks = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$($receiver.withIndex(), _.connected$f);
+      var count = {v: Kotlin.modules['stdlib'].kotlin.sequences.count_uya9q7$(blacks)};
+      if (count.v === 0)
+        return true;
+      var tmp$0 = Kotlin.modules['stdlib'].kotlin.sequences.first_uya9q7$(blacks).position
+      , x = tmp$0.component1()
+      , y = tmp$0.component2();
+      var stack = new _.Stack();
+      var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
+      stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $receiver.get_vux9f0$(x, y)));
+      while (!stack.isEmpty) {
+        var p = stack.pop();
+        if (visited.contains_za3rmp$(p))
+          continue;
+        visitor$break: {
+          if (p.value <= -1) {
+            count.v--;
+            c = true;
+            break visitor$break;
+          }
+          c = false;
+        }
+        Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p);
+        if (c) {
+          var tmp$2 = p.position
+          , nx = tmp$2.component1()
+          , ny = tmp$2.component2();
+          var tmp$1;
+          tmp$1 = $receiver.neighbors_vux9f0$(nx, ny).iterator();
+          while (tmp$1.hasNext()) {
+            var element = tmp$1.next();
+            stack.push_za3rmp$(element);
+          }
+        }
+      }
+      return count.v === 0;
+    },
+    paintYellow$f: function (it) {
+      return it.value === 0;
+    },
+    paintYellow: function ($receiver) {
+      var tmp$0;
+      tmp$0 = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$($receiver.withIndex(), _.paintYellow$f).iterator();
+      while (tmp$0.hasNext()) {
+        var element = tmp$0.next();
+        var tmp$1 = element.position
+        , x = tmp$1.component1()
+        , y = tmp$1.component2();
+        $receiver.set_qt1joh$(x, y, -2);
+      }
+    },
+    isBox: function ($receiver, x, y) {
+      if ($receiver.get_vux9f0$(x, y) !== -1)
+        return false;
+      var nw = _.black($receiver.neighborsNW_vux9f0$(x, y)).size === 3;
+      var ne = _.black($receiver.neighborsNE_vux9f0$(x, y)).size === 3;
+      var sw = _.black($receiver.neighborsSW_vux9f0$(x, y)).size === 3;
+      var se = _.black($receiver.neighborsSE_vux9f0$(x, y)).size === 3;
+      if (nw || ne || sw || se)
+        return true;
+      return false;
+    },
+    Counter: Kotlin.createClass(null, function (init) {
+      if (init === void 0)
+        init = 0;
+      this.$value_by46qp$ = init;
+    }, /** @lends _.Counter.prototype */ {
+      value: {
+        get: function () {
+          return this.$value_by46qp$;
+        },
+        set: function (value) {
+          this.$value_by46qp$ = value;
+        }
+      },
+      increment: function () {
+        this.value++;
+      },
+      decrement: function () {
+        this.value--;
+      },
+      copy: function () {
+        return new _.Counter(this.value);
+      },
+      toString: function () {
+        return this.value.toString();
+      }
+    }),
+    Solver: Kotlin.createClass(null, function (input) {
+      this.numbers_934qrz$ = Kotlin.modules['stdlib'].kotlin.sequences.toList_uya9q7$(Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(input.withIndex(), _.Solver.numbers_934qrz$f));
+      this.board_myhj6z$ = this.preprocess(input.copy());
+      var $receiver = Kotlin.modules['stdlib'].kotlin.collections.withIndex_q5oq31$(this.numbers_934qrz$);
+      var destination = new Kotlin.ArrayList();
+      var tmp$8;
+      tmp$8 = $receiver.iterator();
+      while (tmp$8.hasNext()) {
+        var element = tmp$8.next();
+        if (element.value.value > 1) {
+          destination.add_za3rmp$(element);
+        }
+      }
+      var destination_0 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(destination, 10));
+      var tmp$9;
+      tmp$9 = destination.iterator();
+      while (tmp$9.hasNext()) {
+        var item = tmp$9.next();
+        destination_0.add_za3rmp$(item.index);
+      }
+      this.hungry_4brka0$ = Kotlin.modules['stdlib'].kotlin.collections.toSet_q5oq31$(destination_0);
+      var tmp$4 = this.board_myhj6z$.size;
+      var $receiver_1 = this.numbers_934qrz$;
+      var destination_1 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault($receiver_1, 10));
+      var tmp$11;
+      tmp$11 = $receiver_1.iterator();
+      while (tmp$11.hasNext()) {
+        var item_0 = tmp$11.next();
+        destination_1.add_za3rmp$(item_0.value);
+      }
+      var tmp$6 = tmp$4 - Kotlin.modules['stdlib'].kotlin.collections.sum_q1ah1m$(destination_1);
+      var $receiver_2 = this.board_myhj6z$;
+      var destination_2 = new Kotlin.ArrayList();
+      var tmp$13;
+      tmp$13 = $receiver_2.iterator();
+      while (tmp$13.hasNext()) {
+        var element_0 = tmp$13.next();
+        if (element_0 === -1) {
+          destination_2.add_za3rmp$(element_0);
+        }
+      }
+      this.blacks_1cbalr$ = tmp$6 - destination_2.size;
+      this.last_j2qaup$ = this.board_myhj6z$;
+    }, /** @lends _.Solver.prototype */ {
+      preprocess: function ($receiver) {
+        _.paintYellow($receiver);
+        var tmp$0;
+        var index = 0;
+        tmp$0 = this.numbers_934qrz$.iterator();
+        while (tmp$0.hasNext()) {
+          var item = tmp$0.next();
+          var i = index++;
+          var tmp$1 = item.position
+          , x = tmp$1.component1()
+          , y = tmp$1.component2();
+          $receiver.set_qt1joh$(x, y, i);
+        }
+        return $receiver;
+      },
+      postprocess: function ($receiver) {
+        var wi = $receiver.withIndex();
+        var tmp$0;
+        tmp$0 = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(wi, _.Solver.postprocess$f).iterator();
+        while (tmp$0.hasNext()) {
+          var element = tmp$0.next();
+          var tmp$1 = element.position
+          , x = tmp$1.component1()
+          , y = tmp$1.component2();
+          $receiver.set_qt1joh$(x, y, 0);
+        }
+        var tmp$2;
+        tmp$2 = this.numbers_934qrz$.iterator();
+        while (tmp$2.hasNext()) {
+          var element_0 = tmp$2.next();
+          var tmp$3 = element_0.position
+          , x_0 = tmp$3.component1()
+          , y_0 = tmp$3.component2();
+          $receiver.set_qt1joh$(x_0, y_0, element_0.value);
+        }
+      },
+      solveIn: function (board, offset, blacks, hungry) {
+        var tmp$0, tmp$1;
+        this.last_j2qaup$ = board;
+        var black = _.Solver.solveIn$black(board);
+        var yellow = _.Solver.solveIn$yellow(board);
+        var paintBlack = _.Solver.solveIn$paintBlack(blacks, board);
+        var paintBlack_0 = _.Solver.solveIn$paintBlack_0(board, paintBlack);
+        var process = _.Solver.solveIn$process(offset, board, hungry, this, yellow, paintBlack, black);
+        if (offset >= 0) {
+          if (board.get_za3lpa$(offset) !== -2)
+            return null;
+          if (paintBlack_0(offset))
+            return null;
+        }
+        if (!process())
+          return null;
+        if (!_.connected(board))
+          return null;
+        if (blacks.value === 0 && hungry.isEmpty())
+          return board;
+        if (blacks.value === 0) {
+          if (!process(board.size))
+            return null;
+          if (!_.connected(board))
+            return null;
+          if (!hungry.isEmpty())
+            return null;
+          return board;
+        }
+        if (hungry.isEmpty()) {
+          var tmp$2;
+          tmp$2 = yellow().iterator();
+          while (tmp$2.hasNext()) {
+            var element = tmp$2.next();
+            var tmp$3 = element.position
+            , x = tmp$3.component1()
+            , y = tmp$3.component2();
+            if (paintBlack(x, y))
+              return null;
+          }
+          if (!_.connected(board))
+            return null;
+          return board;
+        }
+        tmp$0 = offset + 1;
+        tmp$1 = board.size - 1;
+        for (var i = tmp$0; i <= tmp$1; i++) {
+          var r = this.solveIn(board.copy(), i, blacks.copy(), Kotlin.modules['stdlib'].kotlin.collections.toMutableSet_q5oq31$(hungry));
+          if (r != null)
+            return r;
+        }
+        return null;
+      },
+      solve: function () {
+        var solution = this.solveIn(this.board_myhj6z$, -1, new _.Counter(this.blacks_1cbalr$), Kotlin.modules['stdlib'].kotlin.collections.toMutableSet_q5oq31$(this.hungry_4brka0$));
+        solution != null ? this.postprocess(solution) : null;
+        return solution;
+      }
+    }, /** @lends _.Solver */ {
+      postprocess$f: function (it) {
+        return it.value >= 0;
+      },
+      black$f: function (it) {
+        return it.value === -1;
+      },
+      solveIn$black: function (closure$board) {
+        return function () {
+          return Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(closure$board.withIndex(), _.Solver.black$f);
+        };
+      },
+      yellow$f: function (it) {
+        return it.value === -2;
+      },
+      solveIn$yellow: function (closure$board) {
+        return function () {
+          return Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(closure$board.withIndex(), _.Solver.yellow$f);
+        };
+      },
+      solveIn$paintBlack: function (closure$blacks, closure$board) {
+        return function (x, y) {
+          closure$blacks.decrement();
+          closure$board.set_qt1joh$(x, y, -1);
+          return _.isBox(closure$board, x, y);
+        };
+      },
+      solveIn$paintBlack_0: function (closure$board, closure$paintBlack) {
+        return function (offset) {
+          var y = offset / closure$board.columns | 0;
+          var x = offset % closure$board.columns;
+          return closure$paintBlack(x, y);
+        };
+      },
+      solveIn$process: function (closure$offset, closure$board, closure$hungry, this$Solver, closure$yellow, closure$paintBlack, closure$black) {
+        return function (offset) {
+          if (offset === void 0)
+            offset = closure$offset;
+          do {
+            var changes = {v: 0};
+            var tmp$0;
+            tmp$0 = closure$hungry.iterator();
+            while (tmp$0.hasNext()) {
+              var element = tmp$0.next();
+              var this$Solver_0 = this$Solver;
+              var closure$board_0 = closure$board;
+              var closure$hungry_0 = closure$hungry;
+              var c;
+              var h = element;
+              var n = this$Solver_0.numbers_934qrz$.get_za3lpa$(h);
+              var tmp$4 = n.position
+              , x = tmp$4.component1()
+              , y = tmp$4.component2();
+              var off = closure$board_0.offset_vux9f0$(x, y);
+              if (off < offset) {
+                var counter = {v: n.value};
+                var canExpand = {v: false};
+                var stack = new _.Stack();
+                var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
+                stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, closure$board_0.get_vux9f0$(x, y)));
+                while (!stack.isEmpty) {
+                  var p = stack.pop();
+                  if (visited.contains_za3rmp$(p))
+                    continue;
+                  visitor$break: {
+                    var tmp$3 = p.position
+                    , dx = tmp$3.component1()
+                    , dy = tmp$3.component2();
+                    var value = p.value;
+                    if (closure$board_0.offset_vux9f0$(dx, dy) < offset) {
+                      if (value >= 0 && value !== h)
+                        return false;
+                      if (value === -1) {
+                        c = false;
+                        break visitor$break;
+                      }
+                      counter.v--;
+                      closure$board_0.set_qt1joh$(dx, dy, h);
+                      if (value === -2)
+                        changes.v++;
+                      c = true;
+                      break visitor$break;
+                    }
+                     else if (value === -2) {
+                      canExpand.v = true;
+                    }
+                    c = false;
+                  }
+                  Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p);
+                  if (c) {
+                    var tmp$2 = p.position
+                    , nx = tmp$2.component1()
+                    , ny = tmp$2.component2();
+                    var tmp$1;
+                    tmp$1 = closure$board_0.neighbors_vux9f0$(nx, ny).iterator();
+                    while (tmp$1.hasNext()) {
+                      var element_0 = tmp$1.next();
+                      stack.push_za3rmp$(element_0);
+                    }
+                  }
+                }
+                if (counter.v === 0)
+                  closure$hungry_0.remove_za3rmp$(h);
+                if (counter.v < 0)
+                  return false;
+                if (counter.v > 0 && !canExpand.v)
+                  return false;
+              }
+            }
+            var closure$board_2 = closure$board;
+            var tmp$6;
+            tmp$6 = closure$yellow().iterator();
+            while (tmp$6.hasNext()) {
+              var element_1 = tmp$6.next();
+              var tmp$5 = element_1.position
+              , x_0 = tmp$5.component1()
+              , y_0 = tmp$5.component2();
+              var n_0 = closure$board_2.neighbors_vux9f0$(x_0, y_0);
+              var closure$hungry_1 = closure$hungry;
+              var closure$paintBlack_0 = closure$paintBlack;
+              var destination = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(n_0, 10));
+              var tmp$7;
+              tmp$7 = n_0.iterator();
+              while (tmp$7.hasNext()) {
+                var item = tmp$7.next();
+                destination.add_za3rmp$(item.value);
+              }
+              var destination_0 = new Kotlin.ArrayList();
+              var tmp$8;
+              tmp$8 = destination.iterator();
+              while (tmp$8.hasNext()) {
+                var element_2 = tmp$8.next();
+                if (element_2 >= 0) {
+                  destination_0.add_za3rmp$(element_2);
+                }
+              }
+              var whts = Kotlin.modules['stdlib'].kotlin.collections.distinct_q5oq31$(destination_0);
+              if (whts.size >= 2 || (whts.size === 1 && !closure$hungry_1.contains_za3rmp$(Kotlin.modules['stdlib'].kotlin.collections.first_a7ptmv$(whts)))) {
+                changes.v++;
+                if (closure$paintBlack_0(x_0, y_0))
+                  return false;
+              }
+            }
+            var closure$board_4 = closure$board;
+            var tmp$10;
+            tmp$10 = closure$yellow().iterator();
+            while (tmp$10.hasNext()) {
+              var element_3 = tmp$10.next();
+              var tmp$9 = element_3.position
+              , x_2 = tmp$9.component1()
+              , y_2 = tmp$9.component2();
+              var n_2 = closure$board_4.neighbors_vux9f0$(x_2, y_2);
+              var closure$paintBlack_1 = closure$paintBlack;
+              var destination_1 = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(n_2, 10));
+              var tmp$11;
+              tmp$11 = n_2.iterator();
+              while (tmp$11.hasNext()) {
+                var item_0 = tmp$11.next();
+                destination_1.add_za3rmp$(item_0.value);
+              }
+              var destination_2 = new Kotlin.ArrayList();
+              var tmp$12;
+              tmp$12 = destination_1.iterator();
+              while (tmp$12.hasNext()) {
+                var element_4 = tmp$12.next();
+                if (element_4 === -1) {
+                  destination_2.add_za3rmp$(element_4);
+                }
+              }
+              var blks = destination_2;
+              if (blks.size === n_2.size) {
+                changes.v++;
+                if (closure$paintBlack_1(x_2, y_2))
+                  return false;
+              }
+            }
+            var closure$board_6 = closure$board;
+            var tmp$14;
+            tmp$14 = closure$black().iterator();
+            while (tmp$14.hasNext()) {
+              var element_5 = tmp$14.next();
+              var tmp$13 = element_5.position
+              , x_4 = tmp$13.component1()
+              , y_4 = tmp$13.component2();
+              var n_4 = closure$board_6.neighbors_vux9f0$(x_4, y_4);
+              var closure$board_8 = closure$board;
+              var closure$paintBlack_2 = closure$paintBlack;
+              var tmp$15;
+              var first = new Kotlin.ArrayList();
+              var second = new Kotlin.ArrayList();
+              tmp$15 = n_4.iterator();
+              while (tmp$15.hasNext()) {
+                var element_6 = tmp$15.next();
+                if (element_6.value >= 0) {
+                  first.add_za3rmp$(element_6);
+                }
+                 else {
+                  second.add_za3rmp$(element_6);
+                }
+              }
+              var tmp$17 = new Kotlin.modules['stdlib'].kotlin.Pair(first, second)
+              , whts_0 = tmp$17.component1()
+              , rest = tmp$17.component2();
+              if (whts_0.size === n_4.size - 1) {
+                var tmp$16 = Kotlin.modules['stdlib'].kotlin.collections.first_a7ptmv$(rest).position
+                , nx_0 = tmp$16.component1()
+                , ny_0 = tmp$16.component2();
+                var restv = closure$board_8.get_vux9f0$(nx_0, ny_0);
+                if (restv === -2) {
+                  changes.v++;
+                  if (closure$paintBlack_2(nx_0, ny_0))
+                    return false;
+                }
+              }
+            }
+          }
+           while (changes.v > 0);
+          return true;
+        };
+      },
+      numbers_934qrz$f: function (it) {
+        return it.value > 0;
       }
     }),
     solve_3ucpiw$f: function (it) {
@@ -341,12 +955,12 @@
     solve_3ucpiw$f_0: function (it) {
       return it.value - 1;
     },
-    paintYellow$f: function (it) {
+    paintYellow$f_1: function (it) {
       return it.value === 0;
     },
     solve_3ucpiw$paintYellow: function () {
       var tmp$0;
-      tmp$0 = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(this.withIndex(), _.paintYellow$f).iterator();
+      tmp$0 = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(this.withIndex(), _.paintYellow$f_1).iterator();
       while (tmp$0.hasNext()) {
         var element = tmp$0.next();
         var tmp$1 = element.position
@@ -355,12 +969,12 @@
         this.set_qt1joh$(x, y, -2);
       }
     },
-    connected$f: function (it) {
+    connected$f_1: function (it) {
       return it.value === -1 || it.value === -2;
     },
     solve_3ucpiw$connected: function () {
       var copy = this.copy();
-      var blacks = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(this.withIndex(), _.connected$f);
+      var blacks = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(this.withIndex(), _.connected$f_1);
       var size = Kotlin.modules['stdlib'].kotlin.sequences.count_uya9q7$(blacks);
       if (size > 0) {
         var stack = Kotlin.modules['stdlib'].kotlin.collections.mutableListOf_9mqe4v$([Kotlin.modules['stdlib'].kotlin.sequences.first_uya9q7$(blacks).position]);
@@ -720,78 +1334,6 @@
         return this.list_54ut98$.iterator();
       }
     }),
-    Tree: Kotlin.createClass(null, function (value, childGetter, degree) {
-      this.value = value;
-      this.childGetter = childGetter;
-      this.degree = degree;
-      this.children = new Kotlin.modules['stdlib'].kotlin.collections.Iterable$f(_.Tree.children$f(this));
-    }, /** @lends _.Tree.prototype */ {
-      get_za3lpa$: function (i) {
-        return this.childGetter(i);
-      },
-      depthFirstWithAbort_ocw5cw$: function (visitor) {
-        var stack = new _.Stack();
-        stack.push_za3rmp$(new Kotlin.modules['stdlib'].kotlin.Pair(this, 0));
-        while (!stack.isEmpty) {
-          var tmp$0 = stack.pop()
-          , node = tmp$0.component1()
-          , index = tmp$0.component2();
-          if (index === 0)
-            if (!visitor(node.value))
-              continue;
-          if (index < node.degree) {
-            stack.push_za3rmp$(new Kotlin.modules['stdlib'].kotlin.Pair(node, index + 1));
-            stack.push_za3rmp$(new Kotlin.modules['stdlib'].kotlin.Pair(node.get_za3lpa$(index), 0));
-          }
-        }
-      },
-      depthFirst_lm9z1s$: function (visitor) {
-        this.depthFirstWithAbort_ocw5cw$(_.Tree.depthFirst_lm9z1s$f(visitor));
-      }
-    }, /** @lends _.Tree */ {
-      depthFirst_lm9z1s$f: function (closure$visitor) {
-        return function (it) {
-          closure$visitor(it);
-          return true;
-        };
-      },
-      children$f$f: Kotlin.createClass(function () {
-        return [Kotlin.modules['builtins'].kotlin.collections.Iterator];
-      }, function (this$Tree_0) {
-        this.this$Tree_0 = this$Tree_0;
-        this.i = 0;
-      }, /** @lends _.Tree.children$f$f.prototype */ {
-        hasNext: function () {
-          return this.i < this.this$Tree_0.degree;
-        },
-        next: function () {
-          var ret = this.this$Tree_0.get_za3lpa$(this.i);
-          this.i++;
-          return ret;
-        }
-      }, /** @lends _.Tree.children$f$f */ {
-      }),
-      children$f: function (this$Tree) {
-        return function () {
-          return new _.Tree.children$f$f(this$Tree);
-        };
-      },
-      Tree_init_p3fpvf$f: function (closure$children) {
-        return function (it) {
-          return closure$children.get_za3lpa$(it);
-        };
-      }
-    }),
-    Tree_init_p3fpvf$: function (value, children, $this) {
-      $this = $this || Object.create(_.Tree.prototype);
-      _.Tree.call($this, value, _.Tree.Tree_init_p3fpvf$f(children), children.size);
-      return $this;
-    },
-    Tree_init_za3rmp$: function (value, $this) {
-      $this = $this || Object.create(_.Tree.prototype);
-      _.Tree_init_p3fpvf$(value, Kotlin.modules['stdlib'].kotlin.collections.emptyList(), $this);
-      return $this;
-    },
     floor_yrwdxs$: function ($receiver) {
       return Math.floor($receiver);
     },
@@ -799,21 +1341,40 @@
       var rect = element.getBoundingClientRect();
       return new Kotlin.modules['stdlib'].kotlin.Pair($receiver.clientX - rect.left, $receiver.clientY - rect.top);
     },
-    fill_o6wbmy$f: function (closure$toReplace, closure$color, this$fill) {
-      return function (it) {
-        if (it.value === closure$toReplace) {
-          var tmp$0 = it.position
+    fill_o6wbmy$: function ($receiver, x, y, color) {
+      var c;
+      var toReplace = $receiver.get_vux9f0$(x, y);
+      var stack = new _.Stack();
+      var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
+      stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $receiver.get_vux9f0$(x, y)));
+      while (!stack.isEmpty) {
+        var p = stack.pop();
+        if (visited.contains_za3rmp$(p))
+          continue;
+        visitor$break: {
+          if (p.value === toReplace) {
+            var tmp$2 = p.position
+            , nx_0 = tmp$2.component1()
+            , ny_0 = tmp$2.component2();
+            $receiver.set_qt1joh$(nx_0, ny_0, color);
+            c = true;
+            break visitor$break;
+          }
+          c = false;
+        }
+        Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p);
+        if (c) {
+          var tmp$0 = p.position
           , nx = tmp$0.component1()
           , ny = tmp$0.component2();
-          this$fill.set_qt1joh$(nx, ny, closure$color);
-          return true;
+          var tmp$1;
+          tmp$1 = $receiver.neighbors_vux9f0$(nx, ny).iterator();
+          while (tmp$1.hasNext()) {
+            var element = tmp$1.next();
+            stack.push_za3rmp$(element);
+          }
         }
-        return false;
-      };
-    },
-    fill_o6wbmy$: function ($receiver, x, y, color) {
-      var toReplace = $receiver.get_vux9f0$(x, y);
-      $receiver.depthFirst_j3dvhl$(x, y, _.fill_o6wbmy$f(toReplace, color, $receiver));
+      }
     }
   });
   Kotlin.defineModule('nurikabe', _);
