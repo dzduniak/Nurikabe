@@ -174,19 +174,70 @@ class Solver(input: Board<Int>) {
                             return false
                     }
                 }
-                /*helper(black()) { x, y, n ->
-                    val (whts, rest) = n.partition { it.value >= 0 }
-                    if (whts.size == n.size - 1) {
-                        val (nx, ny) = rest.first().position
-                        val restv = board[nx, ny]
-                        if (restv == -2) {
-                            changes++
-                            if (paintBlack(nx, ny))
-                                return false
-                        }
-                    }
-                }*/
+                val aps = mutableListOf<PositionValue<Int>>()
+                val visited = mutableSetOf<PositionValue<Int>>()
+                val disc = mutableMapOf<PositionValue<Int>, Int>()
+                val low = mutableMapOf<PositionValue<Int>, Int>()
+                val parent = mutableMapOf<PositionValue<Int>, PositionValue<Int>>()
+                var time = 0
+                fun findAP(u: PositionValue<Int>) {
+                    // Count of children in DFS Tree
+                    var children = 0
 
+                    // Mark the current node as visited
+                    visited.add(u)
+
+                    // Initialize discovery time and low value
+                    time++
+                    disc[u] = time
+                    low[u] = ++time;
+
+                    // Go through all vertices aadjacent to this
+                    val (x, y) = u.position
+                    val neighbors = board.neighbors(x, y).filter { it.value <= -1 }
+                    neighbors.forEach {
+                        val v = it  // v is current adjacent of u
+
+                        // If v is not visited yet, then make it a child of u
+                        // in DFS tree and recur for it
+                        if (!visited.contains(v)) {
+                            children++;
+                            parent[v] = u;
+                            findAP(v);
+
+                            // Check if the subtree rooted with v has a connection to
+                            // one of the ancestors of u
+                            low[u] = Math.min(low[u] ?: 0, low[v] ?: 0);
+
+                            // u is an articulation point in following cases
+
+                            // (1) u is root of DFS tree and has two or more chilren.
+                            if (parent[u] == null && children > 1)
+                                aps.add(u)
+
+                            // (2) If u is not root and low value of one of its child
+                            // is more than discovery value of u.
+                            if (parent[u] != null && low[v] ?: 0 >= disc[u] ?: 0)
+                                aps.add(u)
+                        }
+
+                        // Update low value of u for parent function calls.
+                        else if (v != parent[u])
+                            low[u] = Math.min(low[u] ?: 0, disc[v] ?: 0);
+                    }
+                }
+
+                val first = board.withIndex().filter { it.value <= -1 }.firstOrNull()
+                if (first != null)
+                    findAP(first)
+                aps.forEach {
+                    val (x, y) = it.position
+                    if (board[x, y] == -2) {
+                        changes++
+                        if (paintBlack(x, y))
+                            return false
+                    }
+                }
             } while (changes > 0)
 
             return true

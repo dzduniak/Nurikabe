@@ -759,6 +759,57 @@
           return closure$paintBlack(x, y);
         };
       },
+      process$findAP: function (closure$visited, closure$time, closure$disc, closure$low, closure$board, closure$parent, closure$aps) {
+        return function closure$findAP(u) {
+          var children = {v: 0};
+          closure$visited.add_za3rmp$(u);
+          closure$time.v++;
+          closure$disc.put_wn2jw4$(u, closure$time.v);
+          closure$low.put_wn2jw4$(u, ++closure$time.v);
+          var tmp$0 = u.position
+          , x = tmp$0.component1()
+          , y = tmp$0.component2();
+          var $receiver = closure$board.neighbors_vux9f0$(x, y);
+          var destination = new Kotlin.ArrayList();
+          var tmp$1;
+          tmp$1 = $receiver.iterator();
+          while (tmp$1.hasNext()) {
+            var element = tmp$1.next();
+            if (element.value <= -1) {
+              destination.add_za3rmp$(element);
+            }
+          }
+          var neighbors = destination;
+          var tmp$2;
+          tmp$2 = neighbors.iterator();
+          while (tmp$2.hasNext()) {
+            var element_0 = tmp$2.next();
+            var closure$visited_0 = closure$visited;
+            var closure$parent_0 = closure$parent;
+            var closure$findAP_0 = closure$findAP;
+            var closure$low_0 = closure$low;
+            var closure$aps_0 = closure$aps;
+            var closure$disc_0 = closure$disc;
+            var tmp$7, tmp$4, tmp$3, tmp$6, tmp$5, tmp$8;
+            var v = element_0;
+            if (!closure$visited_0.contains_za3rmp$(v)) {
+              children.v++;
+              closure$parent_0.put_wn2jw4$(v, u);
+              closure$findAP_0(v);
+              closure$low_0.put_wn2jw4$(u, Math.min((tmp$7 = closure$low_0.get_za3rmp$(u)) != null ? tmp$7 : 0, (tmp$4 = closure$low_0.get_za3rmp$(v)) != null ? tmp$4 : 0));
+              if (closure$parent_0.get_za3rmp$(u) == null && children.v > 1)
+                closure$aps_0.add_za3rmp$(u);
+              if (closure$parent_0.get_za3rmp$(u) != null && ((tmp$3 = closure$low_0.get_za3rmp$(v)) != null ? tmp$3 : 0) >= ((tmp$6 = closure$disc_0.get_za3rmp$(u)) != null ? tmp$6 : 0))
+                closure$aps_0.add_za3rmp$(u);
+            }
+             else if (!Kotlin.equals(v, closure$parent_0.get_za3rmp$(u)))
+              closure$low_0.put_wn2jw4$(u, Math.min((tmp$5 = closure$low_0.get_za3rmp$(u)) != null ? tmp$5 : 0, (tmp$8 = closure$disc_0.get_za3rmp$(v)) != null ? tmp$8 : 0));
+          }
+        };
+      },
+      process$f_2: function (it) {
+        return it.value <= -1;
+      },
       solveIn$process: function (closure$offset, closure$board, closure$hungry, this$Solver, closure$yellow, closure$paintBlack) {
         return function (offset) {
           if (offset === void 0)
@@ -783,11 +834,11 @@
                 var counter = {v: n.value};
                 var canExpand = {v: false};
                 var stack = new _.Stack();
-                var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
+                var visited_0 = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
                 stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, closure$board_0.get_vux9f0$(x, y)));
                 while (!stack.isEmpty) {
                   var p = stack.pop();
-                  if (visited.contains_za3rmp$(p))
+                  if (visited_0.contains_za3rmp$(p))
                     continue;
                   visitor$break: {
                     var tmp$3 = p.position
@@ -813,7 +864,7 @@
                     }
                     c = false;
                   }
-                  Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p);
+                  Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited_0, p);
                   if (c) {
                     var tmp$2 = p.position
                     , nx = tmp$2.component1()
@@ -898,6 +949,31 @@
               if (blks.size === n_2.size) {
                 changes.v++;
                 if (closure$paintBlack_1(x_2, y_2))
+                  return false;
+              }
+            }
+            var aps = Kotlin.modules['stdlib'].kotlin.collections.mutableListOf_9mqe4v$([]);
+            var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
+            var disc = Kotlin.modules['stdlib'].kotlin.collections.mutableMapOf_eoa9s7$([]);
+            var low = Kotlin.modules['stdlib'].kotlin.collections.mutableMapOf_eoa9s7$([]);
+            var parent = Kotlin.modules['stdlib'].kotlin.collections.mutableMapOf_eoa9s7$([]);
+            var time = {v: 0};
+            var findAP = _.Solver.process$findAP(visited, time, disc, low, closure$board, parent, aps);
+            var first = Kotlin.modules['stdlib'].kotlin.sequences.firstOrNull_uya9q7$(Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(closure$board.withIndex(), _.Solver.process$f_2));
+            if (first != null)
+              findAP(first);
+            var tmp$13;
+            tmp$13 = aps.iterator();
+            while (tmp$13.hasNext()) {
+              var element_5 = tmp$13.next();
+              var closure$board_6 = closure$board;
+              var closure$paintBlack_2 = closure$paintBlack;
+              var tmp$14 = element_5.position
+              , x_4 = tmp$14.component1()
+              , y_4 = tmp$14.component2();
+              if (closure$board_6.get_vux9f0$(x_4, y_4) === -2) {
+                changes.v++;
+                if (closure$paintBlack_2(x_4, y_4))
                   return false;
               }
             }
