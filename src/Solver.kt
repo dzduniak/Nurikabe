@@ -92,7 +92,6 @@ class Solver(input: Board<Int>) {
     private fun solveIn(board: Board<Int>, offset: Int, blacks: Counter, hungry: MutableSet<Int>): Board<Int>? {
         last = board
 
-        fun black() = board.withIndex().filter { it.value == -1 }
         fun yellow() = board.withIndex().filter { it.value == -2 }
 
         fun paintBlack(x: Int, y: Int): Boolean {
@@ -190,7 +189,7 @@ class Solver(input: Board<Int>) {
                     // Initialize discovery time and low value
                     time++
                     disc[u] = time
-                    low[u] = ++time;
+                    low[u] = time
 
                     // Go through all vertices aadjacent to this
                     val (x, y) = u.position
@@ -201,13 +200,13 @@ class Solver(input: Board<Int>) {
                         // If v is not visited yet, then make it a child of u
                         // in DFS tree and recur for it
                         if (!visited.contains(v)) {
-                            children++;
-                            parent[v] = u;
-                            findAP(v);
+                            children++
+                            parent[v] = u
+                            findAP(v)
 
                             // Check if the subtree rooted with v has a connection to
                             // one of the ancestors of u
-                            low[u] = Math.min(low[u] ?: 0, low[v] ?: 0);
+                            low[u] = Math.min(low[u] ?: 0, low[v] ?: 0)
 
                             // u is an articulation point in following cases
 
@@ -223,7 +222,7 @@ class Solver(input: Board<Int>) {
 
                         // Update low value of u for parent function calls.
                         else if (v != parent[u])
-                            low[u] = Math.min(low[u] ?: 0, disc[v] ?: 0);
+                            low[u] = Math.min(low[u] ?: 0, disc[v] ?: 0)
                     }
                 }
 

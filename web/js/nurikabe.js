@@ -670,7 +670,6 @@
       solveIn: function (board, offset, blacks, hungry) {
         var tmp$0, tmp$1;
         this.last_j2qaup$ = board;
-        var black = _.Solver.solveIn$black(board);
         var yellow = _.Solver.solveIn$yellow(board);
         var paintBlack = _.Solver.solveIn$paintBlack(blacks, board);
         var paintBlack_0 = _.Solver.solveIn$paintBlack_0(board, paintBlack);
@@ -729,14 +728,6 @@
       postprocess$f: function (it) {
         return it.value >= 0;
       },
-      black$f: function (it) {
-        return it.value === -1;
-      },
-      solveIn$black: function (closure$board) {
-        return function () {
-          return Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(closure$board.withIndex(), _.Solver.black$f);
-        };
-      },
       yellow$f: function (it) {
         return it.value === -2;
       },
@@ -765,7 +756,7 @@
           closure$visited.add_za3rmp$(u);
           closure$time.v++;
           closure$disc.put_wn2jw4$(u, closure$time.v);
-          closure$low.put_wn2jw4$(u, ++closure$time.v);
+          closure$low.put_wn2jw4$(u, closure$time.v);
           var tmp$0 = u.position
           , x = tmp$0.component1()
           , y = tmp$0.component2();
