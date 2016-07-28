@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="82df745f-ac02-4805-98df-16d2dd23a1f5" name="Default" comment="Working solver.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/SolverOld.kt" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+    <list default="true" id="82df745f-ac02-4805-98df-16d2dd23a1f5" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Board.kt" afterPath="$PROJECT_DIR$/src/Board.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Nurikabe.kt" afterPath="$PROJECT_DIR$/src/Nurikabe.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Solver.kt" afterPath="$PROJECT_DIR$/src/Solver.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/index.html" afterPath="$PROJECT_DIR$/web/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/js/lib/kotlin.js" afterPath="$PROJECT_DIR$/web/js/lib/kotlin.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/js/nurikabe.js" afterPath="$PROJECT_DIR$/web/js/nurikabe.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/js/nurikabe.meta.js" afterPath="$PROJECT_DIR$/web/js/nurikabe.meta.js" />
     </list>
     <ignored path="Nurikabe.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -57,8 +47,8 @@
       <file leaf-file-name="Solver.kt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Solver.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="45" selection-start-line="2" selection-start-column="45" selection-end-line="2" selection-end-column="45" />
+            <state relative-caret-position="-2535">
+              <caret line="34" column="48" selection-start-line="34" selection-start-column="48" selection-end-line="34" selection-end-column="48" />
               <folding />
             </state>
           </provider>
@@ -802,16 +792,24 @@
       <workItem from="1469636683327" duration="61000" />
       <workItem from="1469636863564" duration="978000" />
       <workItem from="1469653658589" duration="273000" />
-      <workItem from="1469653971744" duration="15987000" />
+      <workItem from="1469653971744" duration="16220000" />
     </task>
+    <task id="LOCAL-00001" summary="Working solver.">
+      <created>1469719249870</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1469719249870</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="130512000" />
+    <option name="totallyTimeSpent" value="130745000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="80" y="23" width="1360" height="877" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -856,6 +854,7 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <MESSAGE value="Working solver." />
     <option name="LAST_COMMIT_MESSAGE" value="Working solver." />
   </component>
@@ -1086,8 +1085,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Solver.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="45" selection-start-line="2" selection-start-column="45" selection-end-line="2" selection-end-column="45" />
+        <state relative-caret-position="-2535">
+          <caret line="34" column="48" selection-start-line="34" selection-start-column="48" selection-end-line="34" selection-end-column="48" />
           <folding />
         </state>
       </provider>
