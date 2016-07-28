@@ -9,18 +9,21 @@
 </head>
 
 <body>
-<input type="number" value="5" min="1" max="20" id="rows" title="Rows"> x
-<input type="number" value="5" min="1" max="20" id="columns" title="Columns">
-<button type="button" id="update">Update</button>
+<form onsubmit="return false;">
+    <input type="number" value="5" min="1" max="20" id="columns" title="Columns">
+    <input type="number" value="5" min="1" max="20" id="rows" title="Rows"> x
+    <button type="submit" id="update">Update</button>
+</form>
 <br>
-<br>
-<table id="board">
-    <tbody></tbody>
-</table>
-<br>
-<button type="button" id="solve">Solve</button>
-<button type="button" id="next">Next solution</button>
-<p id="notsolved" style="visibility: hidden">Solution does not exist.</p>
+<form onsubmit="return false;">
+    <table id="board">
+        <tbody></tbody>
+    </table>
+    <br>
+    <button type="submit" id="solve">Solve</button>
+    <button type="button" id="next">Next solution</button>
+    <p id="notsolved" style="visibility: hidden">Solution does not exist.</p>
+</form>
 
 <script src="js/lib/kotlin.js"></script>
 <script src="js/nurikabe.js"></script>
