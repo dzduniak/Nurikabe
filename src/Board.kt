@@ -187,4 +187,26 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
 
     override fun toString(): String =
             rowsList.joinToString(separator = ",  ", prefix = "[ ", postfix = " ]", transform = { it.joinToString() })
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+
+        other as Board<*>
+
+        if (rows != other.rows) return false
+        if (columns != other.columns) return false
+        if (values != other.values) return false
+
+        return true
+
+
+    }
+
+    override fun hashCode(): Int {
+        var result = rows
+        result = 31 * result + columns
+        result = 31 * result + values.hashCode()
+        result = 31 * result + size
+        return result
+    }
 }

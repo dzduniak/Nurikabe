@@ -404,6 +404,7 @@ class Solver(input: Board<Int>) {
     private val numbers = input.withIndex().filter { it.value > 0 }.toList()
     private val stack = Stack<Lazy<SolverState>>()
     private var currentState: SolverState = SolverState(input.copy(), numbers)
+    private var previousSolutions = mutableSetOf<Board<Int>>()
 
     val current: Board<Int>
         get() = currentState.current
@@ -420,8 +421,10 @@ class Solver(input: Board<Int>) {
     // Interface
     fun nextSolution(): Board<Int>? {
         while (nextStep()) {
-            if (currentState.solved)
-                return currentState.current
+            if (currentState.solved && !previousSolutions.contains(current)) {
+                previousSolutions.add(current)
+                return current
+            }
         }
         return null
     }
