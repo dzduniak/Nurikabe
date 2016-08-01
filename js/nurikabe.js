@@ -330,6 +330,26 @@
       }),
       toString: function () {
         return Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$(this.rowsList, ',  ', '[ ', ' ]', void 0, void 0, _.Board.toString$f);
+      },
+      equals_za3rmp$: function (other) {
+        var tmp$0;
+        if (this === other)
+          return true;
+        Kotlin.isType(tmp$0 = other, _.Board) ? tmp$0 : Kotlin.throwCCE();
+        if (this.rows !== other.rows)
+          return false;
+        if (this.columns !== other.columns)
+          return false;
+        if (!Kotlin.equals(this.values_1itv7u$, other.values_1itv7u$))
+          return false;
+        return true;
+      },
+      hashCode: function () {
+        var result = this.rows;
+        result = 31 * result + this.columns;
+        result = 31 * result + Kotlin.hashCode(this.values_1itv7u$);
+        result = 31 * result + this.size;
+        return result;
       }
     }, /** @lends _.Board */ {
       withIndex$f: Kotlin.createClass(function () {
@@ -1323,6 +1343,7 @@
       this.numbers_934qrz$ = Kotlin.modules['stdlib'].kotlin.sequences.toList_uya9q7$(Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(input.withIndex(), _.Solver.numbers_934qrz$f));
       this.stack_n7x7v1$ = new _.Stack();
       this.currentState_ab6rn7$ = new _.SolverState(input.copy(), this.numbers_934qrz$);
+      this.previousSolutions_f3e5t4$ = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
       var tmp$0;
       tmp$0 = _.white_3ucpiw$(this.currentState_ab6rn7$.board).iterator();
       while (tmp$0.hasNext()) {
@@ -1347,8 +1368,10 @@
       },
       nextSolution: function () {
         while (this.nextStep()) {
-          if (this.currentState_ab6rn7$.solved)
-            return this.currentState_ab6rn7$.current;
+          if (this.currentState_ab6rn7$.solved && !this.previousSolutions_f3e5t4$.contains_za3rmp$(this.current)) {
+            this.previousSolutions_f3e5t4$.add_za3rmp$(this.current);
+            return this.current;
+          }
         }
         return null;
       },
