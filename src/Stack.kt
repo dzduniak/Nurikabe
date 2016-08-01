@@ -7,6 +7,8 @@ class Stack<E> : Iterable<E> {
     val isEmpty: Boolean
         get() = size == 0
 
+    fun peek() = list.last()
+
     fun push(element: E) {
         list += element
     }

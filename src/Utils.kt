@@ -1,21 +1,26 @@
-import org.w3c.dom.Element
-import org.w3c.dom.events.MouseEvent
-
 fun Double.floor() = Math.floor(this)
+fun Int.abs() = if (this > 0) this else -this
 
-fun MouseEvent.mousePosition(element: Element): Pair<Double, Double> {
-    val rect = element.getBoundingClientRect()
-    return Pair(clientX - rect.left, clientY - rect.top)
-}
+inline fun Board<Int>.fill(x: Int, y: Int, color: Int, toReplace: (Int) -> Boolean): Int {
+    var filled = 0
 
-fun Board<Int>.fill(x: Int, y: Int, color: Int) {
-    val toReplace = this[x, y]
     depthFirst(x, y) {
-        if (it.value == toReplace) {
-            val (nx, ny) = it.position
-            this[nx, ny] = color
+        if (toReplace(it.value)) {
+            filled++
+            this[it.position] = color
             return@depthFirst true
         }
         return@depthFirst false
     }
+
+    return filled
+}
+
+fun Board<Int>.fill(p: Pair<Int, Int>, color: Int, toReplace: (Int) -> Boolean): Int {
+    return fill(p.first,  p.second, color, toReplace)
+}
+
+fun Board<Int>.fill(p: Pair<Int, Int>, color: Int): Int {
+    val toReplace = this[p]
+    return fill(p.first,  p.second, color) { it == toReplace }
 }

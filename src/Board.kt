@@ -36,6 +36,12 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
     fun inBounds(x: Int, y: Int) =
             x >= 0 && x < columns && y >= 0 && y < rows
 
+    operator fun get(p: Pair<Int, Int>) = this[p.first, p.second]
+
+    operator fun set(p: Pair<Int, Int>, value: T) {
+        this[p.first, p.second] = value
+    }
+
     operator fun get(offset: Int) = values[offset]
 
     operator fun set(offset: Int, value: T) {
@@ -84,6 +90,8 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
             }
         }
     }
+
+    fun neighbors(p: Pair<Int, Int>): List<PositionValue<T>> = neighbors(p.first, p.second)
 
     fun neighbors(x: Int, y: Int): List<PositionValue<T>> {
         val left = Pair(x - 1, y)
@@ -171,6 +179,10 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
                 neighbors(nx, ny).forEach { stack.push(it) }
             }
         }
+    }
+
+    inline fun depthFirst(p: Pair<Int, Int>, visitor: (PositionValue<T>) -> Boolean) {
+        depthFirst(p.first, p.second, visitor)
     }
 
     override fun toString(): String =
