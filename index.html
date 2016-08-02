@@ -15,8 +15,8 @@
 </h1>
 <form onsubmit="return false;">
     <p>
-        <input type="number" value="5" min="1" max="20" id="columns" title="Columns">
-        <input type="number" value="5" min="1" max="20" id="rows" title="Rows"> x
+        <input type="number" value="5" min="1" max="20" id="columns" title="Columns"> x
+        <input type="number" value="5" min="1" max="20" id="rows" title="Rows">
         <button type="submit" id="update">Update</button>
     </p>
 </form>
@@ -29,7 +29,7 @@
 </p>
 <p id="notsolved" style="display: none">Solution does not exist.</p>
 
-<p id="debug">
+<p id="debug" style="visibility: hidden">
 </p>
 <p>
     Click on the board to put numbers.<br>Left click increments, right click decrements.<br>Middle click puts a dot.

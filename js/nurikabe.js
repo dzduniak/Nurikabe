@@ -4,7 +4,7 @@
     this.BLACK = -1;
     this.YELLOW = -2;
     this.DOT = -3;
-    this.debug = true;
+    this.debug = false;
   }, /** @lends _ */ {
     PositionValue: Kotlin.createClass(null, function (position, value) {
       this.position = position;
@@ -396,6 +396,8 @@
       var button = _.Nurikabe.Nurikabe$button(counter, this, solver);
       button.call(this.debug_ugmehw$, 'Next step', false, _.Nurikabe.Nurikabe$f_5);
       button.call(this.debug_ugmehw$, 'Apply all', false, _.Nurikabe.Nurikabe$f_6(solver));
+      this.loadBoard_dvdyvu$(this.example2());
+      this.refresh();
     }, /** @lends _.Nurikabe.prototype */ {
       rows: {
         get: function () {
