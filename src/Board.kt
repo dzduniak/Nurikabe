@@ -4,20 +4,6 @@ class PositionValue<out T>(val position: Pair<Int, Int>, val value: T) {
     override fun toString(): String {
         return "[$position : $value]"
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-
-        other as PositionValue<*>
-
-        if (position != other.position) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return position.hashCode()
-    }
 }
 
 class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
@@ -161,27 +147,26 @@ class Board<T>(val rows: Int, val columns: Int, list: List<T>) : Iterable<T> {
         return neighbors.map { PositionValue(it, get(it.first, it.second)) }
     }
 
-    inline fun depthFirst(x: Int, y: Int, visitor: (PositionValue<T>) -> Boolean) {
-        val stack = Stack<PositionValue<T>>()
-        val visited = mutableSetOf<PositionValue<T>>()
-        stack.push(PositionValue(x, y, get(x, y)))
+    fun depthFirst(x: Int, y: Int, visitor: (PositionValue<T>) -> Boolean) {
+        val visited = mutableSetOf<Pair<Int, Int>>()
 
-        while (!stack.isEmpty) {
-            val p = stack.pop()
-            if (visited.contains(p))
-                continue
+        fun search(p: PositionValue<T>) {
+            if (visited.contains(p.position))
+                return
 
             val c = visitor(p)
-            visited += p
+            visited += p.position
 
             if (c) {
                 val (nx, ny) = p.position
-                neighbors(nx, ny).forEach { stack.push(it) }
+                neighbors(nx, ny).forEach { search(it) }
             }
         }
+
+        search(PositionValue(Pair(x, y), this[x, y]))
     }
 
-    inline fun depthFirst(p: Pair<Int, Int>, visitor: (PositionValue<T>) -> Boolean) {
+    fun depthFirst(p: Pair<Int, Int>, visitor: (PositionValue<T>) -> Boolean) {
         depthFirst(p.first, p.second, visitor)
     }
 

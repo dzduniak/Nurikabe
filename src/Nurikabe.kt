@@ -21,12 +21,16 @@ class Nurikabe() {
         get() = columnsInput.valueAsNumber.floor()
     var board = Board(rows, columns, 0)
 
-    fun update() {
-        board = Board(rows, columns, 0)
+    fun loadBoard(board: Board<Int>) {
+        dirty = true
 
+        rowsInput.valueAsNumber = board.rows.toDouble()
+        columnsInput.valueAsNumber = board.columns.toDouble()
+
+        this.board = board
         tbody.remove()
         tbody = table.createTBody() as HTMLTableSectionElement
-        board.rowsList.forEachIndexed { y, list ->
+        this.board.rowsList.forEachIndexed { y, list ->
             val tr = tbody.addElement("tr") { } as HTMLTableRowElement
             list.forEachIndexed { x, v ->
                 val td = tr.addElement("td") {} as HTMLElement
@@ -34,16 +38,22 @@ class Nurikabe() {
                     val me = e as MouseEvent
                     val value = board[x, y]
                     when (me.button.toInt()) {
-                        0 -> if (value == DOT) board[x, y] = 0 else board[x, y]++
-                        1 -> board[x, y] = DOT
-                        2 -> if (value == DOT) board[x, y] = BLACK else
-                            if (value > -1) board[x, y]--
+                        0 -> if (value == DOT) this.board[x, y] = 0 else this.board[x, y]++
+                        1 -> this.board[x, y] = DOT // board.fill(Pair(x, y), BLACK)
+                        2 -> if (value == DOT) this.board[x, y] = BLACK else
+                            if (value > -1) this.board[x, y]--
                     }
                     refresh()
                     true
                 }
             }
         }
+    }
+
+    fun update() {
+        loadBoard(Board(rows, columns, 0))
+        refresh()
+
         next.style.visibility = "hidden"
     }
 
@@ -61,6 +71,57 @@ class Nurikabe() {
                 else -> "white"
             }
         }
+    }
+
+    private fun example1(): Board<Int> {
+        val board = Board(11, 9, 0)
+
+        board[0, 0] = 1
+        board[7, 0] = 1
+
+        board[1, 1] = 4
+        board[4, 1] = 1
+
+        board[8, 2] = 2
+
+        board[5, 3] = 9
+
+        board[1, 5] = 11
+        board[7, 5] = 3
+
+        board[6, 7] = 1
+
+        board[3, 8] = 1
+        board[7, 8] = 2
+
+        board[0, 9] = 9
+
+        board[8, 10] = 1
+        return board
+    }
+
+    private fun example2(): Board<Int> {
+        val board = Board(11, 9, 0)
+
+        board[7, 0] = 2
+
+        board[0, 1] = 2
+        board[5, 1] = 2
+
+
+
+        board[1, 4] = 38
+        board[4, 4] = 1
+
+        board[3, 5] = 2
+
+        board[5, 6] = 3
+
+        board[4, 8] = 1
+
+        board[0, 9] = 2
+
+        return board
     }
 
     init {
@@ -110,6 +171,7 @@ class Nurikabe() {
         }
 
         debug.button("Next step", false) { nextStep() }
+        debug.button("Apply all", false) { solver.currentState.applyAll() }
         /*debug.button { techn0() }
         debug.button { techn1() }
         debug.button { techn2() }
@@ -117,8 +179,9 @@ class Nurikabe() {
         debug.button { techn4() }
         debug.button { techn5() }
         debug.button { techn6() }
-        debug.button { techn7() }
+        debug.button { techn7() }*/
 
-        debug.button("Apply all", false) { applyAll() }*/
+        /*loadBoard(example2())
+        refresh()*/
     }
 }

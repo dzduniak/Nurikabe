@@ -1,7 +1,7 @@
 fun Double.floor() = Math.floor(this)
 fun Int.abs() = if (this > 0) this else -this
 
-inline fun Board<Int>.fill(x: Int, y: Int, color: Int, toReplace: (Int) -> Boolean): Int {
+fun Board<Int>.fill(x: Int, y: Int, color: Int, toReplace: (Int) -> Boolean): Int {
     var filled = 0
 
     depthFirst(x, y) {

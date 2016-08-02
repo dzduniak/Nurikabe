@@ -4,13 +4,14 @@ val DOT = -3
 
 fun Board<Int>.white() = withIndex().filter { it.value >= 0 }
 fun Board<Int>.dot() = withIndex().filter { it.value == DOT }
+fun Board<Int>.whiteOrDot() = withIndex().filter { it.value == DOT || it.value >= 0 }
 fun Board<Int>.black() = withIndex().filter { it.value == BLACK }
 fun Board<Int>.yellow() = withIndex().filter { it.value == YELLOW }
 fun Int.isBlackOrYellow() = this == BLACK || this == YELLOW
 fun distance(p1: Pair<Int, Int>, p2: Pair<Int, Int>) =
         (p1.first - p2.first).abs() + (p1.second - p2.second).abs()
 
-var debug: Boolean = false
+var debug: Boolean = true
 fun trace(s: Any?) {
     if (debug)
         println(s)
@@ -20,11 +21,11 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
                   val totalWhiteCount: Int = numbers.map { it.value }.sum(),
                   val toGo: MutableList<Int> = numbers.map { it.value - 1 }.toMutableList(),
                   var fail: Boolean = false, var solved: Boolean = false,
-                  val previousNumber: Int = -1, val triedBefore: List<Pair<Int, Int>> = emptyList()) {
+                  val previousNumber: Int = -1, val triedBefore: Set<Pair<Int, Int>> = emptySet()) {
 
     fun copy() = SolverState(board.copy(), numbers, totalWhiteCount, toGo.toMutableList())
 
-    fun copy(previousNumber: Int = -1, triedBefore: List<Pair<Int, Int>> = emptyList()) =
+    fun copy(previousNumber: Int = -1, triedBefore: Set<Pair<Int, Int>> = emptySet()) =
             SolverState(board.copy(), numbers, totalWhiteCount, toGo.toMutableList(),
                     previousNumber = previousNumber, triedBefore = triedBefore)
 
@@ -67,20 +68,23 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
             return emptyList()
         }
 
+        if (!canExpandDots()) {
+            trace("Fail expand dots")
+            return emptyList()
+        }
+
         hungry.forEach {
             if (!canExpand(it.first)) {
-                trace("Fail expand")
+                trace("Fail expand hungry")
                 return emptyList()
             }
         }
 
         val firstHungry = hungry.reduce { pair1, pair2 -> if (pair1.second < pair2.second) pair1 else pair2 }.first
-        val triedBefore = triedBefore.toMutableList()
-        var candidates = yellow
-        if (firstHungry == previousNumber) {
+        val triedBefore = triedBefore.toMutableSet()
+        val candidates = yellow.toMutableSet()
+        if (firstHungry == previousNumber)
             candidates -= triedBefore
-            triedBefore.addAll(triedBefore)
-        }
 
         val result = mutableListOf<Lazy<SolverState>>()
         candidates.filter {
@@ -89,7 +93,7 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
         }.forEach {
             val state = lazy {
                 triedBefore += it
-                val state = this.copy(firstHungry, triedBefore.toList())
+                val state = this.copy(firstHungry, triedBefore)
                 state.paintNumber(it, firstHungry)
                 state
             }
@@ -103,10 +107,10 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
     private fun full(i: Int) = if (i == DOT) false else toGo[i] == 0
 
     private fun hasBoxes(): Boolean {
-        for (x in 0..board.columns - 1)
-            for (y in 0..board.rows - 1) {
-                if (board[x, y].isBlackOrYellow()
-                        && board.neighborsSE(x, y).filter { it.value.isBlackOrYellow() }.size == 3)
+        for (x in 0..board.columns - 2)
+            for (y in 0..board.rows - 2) {
+                if (board[x, y] == BLACK
+                        && board.neighborsSE(x, y).filter { it.value == BLACK }.size == 3)
                     return true
             }
 
@@ -130,18 +134,43 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
     private fun inL(p: Pair<Int, Int>) = inL(p.first, p.second)
 
     private fun canExpand(n: Int): Boolean {
-        var counter = -1
+        var counter = 0
         board.depthFirst(numbers[n].position) {
             val value = it.value
-            if (value == n || value == YELLOW || value == DOT) {
+            if (value == YELLOW || value == DOT)
                 counter++
-                return@depthFirst true
-            }
 
-            return@depthFirst false
+            return@depthFirst value == n || value == YELLOW || value == DOT
         }
 
         return counter >= toGo[n]
+    }
+
+    private fun canExpandDots(): Boolean {
+        val visitedDots = mutableSetOf<Pair<Int, Int>>()
+        fun canExpandDot(p: Pair<Int, Int>): Boolean {
+            if (visitedDots.contains(p))
+                return true
+
+            var canExpand = false
+            board.depthFirst(p) {
+                if (it.value == DOT)
+                    visitedDots.add(it.position)
+
+                if (it.value == YELLOW) {
+                    canExpand = true
+                }
+                return@depthFirst it.value == DOT
+            }
+            return canExpand
+        }
+
+        board.dot().forEach {
+            if (!canExpandDot(it.position))
+                return false
+        }
+
+        return true
     }
 
     private fun checkIfSolved() {
@@ -151,7 +180,7 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
             return
         }
 
-        solved = !hasBoxes() && toGo.sum() == 0 && board.dot().count() == 0
+        solved = !hasBoxes() && toGo.sum() == 0 && board.yellow().count() == 0 && board.dot().count() == 0
     }
 
     private fun connected(): Boolean {
@@ -161,12 +190,12 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
             return true
         val (x, y) = blacks.first().position
         board.depthFirst(x, y) {
-            if (it.value == BLACK)
+            if (it.value == BLACK) {
                 count--
+            }
 
             return@depthFirst it.value.isBlackOrYellow()
         }
-
         return count == 0
     }
 
@@ -183,28 +212,43 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
         }
     }
 
-    fun paintNumber(p: Pair<Int, Int>, n: Int) {
-        val neighbors = board.neighbors(p).filter { it.value >= 0 }.map { it.value }.distinct()
-        if (neighbors.size > 1) {
+    private fun paintBlack(p: Pair<Int, Int>): Boolean {
+        if (inL(p)) {
             fail = true
-            trace("Fail fill number")
-            return
+            trace("Fail paint black")
+            return false
         }
+        board[p] = BLACK
 
-        board[p] = n
-        fillNumbers()
+        return true
     }
 
-    fun paintDot(p: Pair<Int, Int>) {
+    fun paintNumber(p: Pair<Int, Int>, n: Int): Boolean {
+        val neighbors = board.neighbors(p)
+        val white = neighbors.filter { it.value >= 0 }.map { it.value }.distinct()
+        if (white.size > 1) {
+            fail = true
+            trace("Fail paint number")
+            return false
+        }
+        board[p] = n
+        fillNumbers()
+
+        return true
+    }
+
+    fun paintDot(p: Pair<Int, Int>): Boolean {
         val neighbors = board.neighbors(p).filter { it.value >= 0 }.map { it.value }.distinct()
         if (neighbors.size > 1) {
             fail = true
             trace("Fail paint dot")
-            return
+            return false
         }
 
         board[p] = DOT
         fillNumbers()
+
+        return true
     }
 
     // Techniques
@@ -218,7 +262,7 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
             val canReach = numbers.map { distance(p1, it.position) < it.value }.fold(false) { a, b -> a || b }
             if (!canReach) {
                 if (board[it.position].isBlackOrYellow())
-                    board[it.position] = BLACK
+                    paintBlack(it.position)
                 else {
                     fail = true
                     return
@@ -235,9 +279,9 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
         var changes = 0
         board.yellow().forEach {
             val whites = board.neighbors(it.position).map { it.value }.filter { it >= 0 }.distinct()
-            if (whites.size >= 2 || (whites.size == 1 && full(whites.first()))) {
-                changes++
-                board[it.position] = BLACK
+            if (board[it.position] == YELLOW && whites.size >= 2 || (whites.size == 1 && full(whites.first()))) {
+                if (paintBlack(it.position))
+                    changes++
             }
         }
         return changes
@@ -252,8 +296,8 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
             val neighbors = board.neighbors(it.position).map { it.value }
             val blacks = neighbors.filter { it == BLACK }
             if (blacks.size == neighbors.size) {
-                changes++
-                board[it.position] = BLACK
+                if (paintBlack(it.position))
+                    changes++
             }
         }
         return changes
@@ -276,9 +320,10 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
                 val first = neighbors.firstOrNull()
                 if (neighbors.size == 1 && first != null) {
                     if (board[first] == YELLOW) {
-                        changes++
-                        board[first] = BLACK
-                        blacksToGo--
+                        if (paintBlack(first)) {
+                            changes++
+                            blacksToGo--
+                        }
                     }
                     parent = current
                     current = first
@@ -294,7 +339,7 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
      */
     fun techn4(): Int {
         var changes = 0
-        board.white().forEach {
+        board.whiteOrDot().forEach {
             val value = it.value
             var current = it.position
             var parent: Pair<Int, Int>? = null
@@ -306,8 +351,12 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
                 val first = neighbors.firstOrNull()
                 if (neighbors.size == 1 && first != null && (board[first] == value || board[first] == YELLOW)) {
                     if (board[first] == YELLOW) {
-                        changes++
-                        paintNumber(first, value)
+                        if (value == DOT)
+                            if (paintDot(first))
+                                changes++
+                            else
+                                if (paintNumber(first, value))
+                                    changes++
                     }
                     parent = current
                     current = first
@@ -342,9 +391,10 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
                     return@depthFirst false
                 }
                 if (c != 0) {
-                    changes++
-                    board[p] = BLACK
-                    count++
+                    if (paintBlack(p)) {
+                        changes++
+                        count++
+                    }
                 } else
                     board[p] = YELLOW
             }
@@ -360,8 +410,8 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
         board.yellow().forEach {
             val p = it.position
             if (inL(p)) {
-                paintDot(p)
-                changes++
+                if (paintDot(p))
+                    changes++
             }
         }
         return changes
@@ -369,7 +419,10 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
 
     fun techn7(): Int {
         var changes = 0
-        numbers.filter { it.value == 2 }.forEach {
+        numbers.forEachIndexed { i, it ->
+            if (it.value != 2 || toGo[i] == 0)
+                return@forEachIndexed
+
             val numPos = it.position
             val neighbors = board.neighbors(numPos).filter { it.value == YELLOW }
             if (neighbors.size == 2) {
@@ -381,8 +434,8 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
                     val x = if (numPos.first != first.first) first.first else second.first
                     val y = if (numPos.second != first.second) first.second else second.second
                     if (board[x, y] == YELLOW) {
-                        board[x, y] = BLACK
-                        changes++
+                        if (paintBlack(Pair(x, y)))
+                            changes++
                     }
                 }
             }
@@ -392,10 +445,12 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
     }
 
     fun applyAll(zero: Boolean = true) {
+        var loops = 0
         if (zero) techn0()
         do {
-            val changes = techn1() + techn2() + techn3() + techn4() + techn5() +
-                    techn6() + techn7()
+            loops++
+            val changes = techn1() + techn2()
+            techn6() + techn7() + techn4() + techn3() + techn5()
         } while (changes > 0)
     }
 }
@@ -403,7 +458,7 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
 class Solver(input: Board<Int>) {
     private val numbers = input.withIndex().filter { it.value > 0 }.toList()
     private val stack = Stack<Lazy<SolverState>>()
-    private var currentState: SolverState = SolverState(input.copy(), numbers)
+    var currentState: SolverState = SolverState(input.copy(), numbers)
     private var previousSolutions = mutableSetOf<Board<Int>>()
 
     val current: Board<Int>
