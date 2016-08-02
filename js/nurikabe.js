@@ -396,8 +396,6 @@
       var button = _.Nurikabe.Nurikabe$button(counter, this, solver);
       button.call(this.debug_ugmehw$, 'Next step', false, _.Nurikabe.Nurikabe$f_5);
       button.call(this.debug_ugmehw$, 'Apply all', false, _.Nurikabe.Nurikabe$f_6(solver));
-      this.loadBoard_dvdyvu$(this.example2());
-      this.refresh();
     }, /** @lends _.Nurikabe.prototype */ {
       rows: {
         get: function () {
