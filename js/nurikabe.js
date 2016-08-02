@@ -4,7 +4,7 @@
     this.BLACK = -1;
     this.YELLOW = -2;
     this.DOT = -3;
-    this.debug = false;
+    this.debug = true;
   }, /** @lends _ */ {
     PositionValue: Kotlin.createClass(null, function (position, value) {
       this.position = position;
@@ -12,18 +12,6 @@
     }, /** @lends _.PositionValue.prototype */ {
       toString: function () {
         return '[' + this.position + ' : ' + this.value + ']';
-      },
-      equals_za3rmp$: function (other) {
-        var tmp$0;
-        if (this === other)
-          return true;
-        Kotlin.isType(tmp$0 = other, _.PositionValue) ? tmp$0 : Kotlin.throwCCE();
-        if (!Kotlin.equals(this.position, other.position))
-          return false;
-        return true;
-      },
-      hashCode: function () {
-        return Kotlin.hashCode(this.position);
       }
     }),
     PositionValue_init_qt1joh$: function (x, y, value, $this) {
@@ -280,54 +268,14 @@
         }
         return destination_0;
       },
-      depthFirst_j3dvhl$: Kotlin.defineInlineFunction('nurikabe.Board.depthFirst_j3dvhl$', function (x, y, visitor) {
-        var stack = new _.Stack();
+      depthFirst_j3dvhl$: function (x, y, visitor) {
         var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-        stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, this.get_vux9f0$(x, y)));
-        while (!stack.isEmpty) {
-          var p = stack.pop();
-          if (visited.contains_za3rmp$(p))
-            continue;
-          var c = visitor(p);
-          Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p);
-          if (c) {
-            var tmp$0 = p.position
-            , nx = tmp$0.component1()
-            , ny = tmp$0.component2();
-            var tmp$1;
-            tmp$1 = this.neighbors_vux9f0$(nx, ny).iterator();
-            while (tmp$1.hasNext()) {
-              var element = tmp$1.next();
-              stack.push_za3rmp$(element);
-            }
-          }
-        }
-      }),
-      depthFirst_kn0zno$: Kotlin.defineInlineFunction('nurikabe.Board.depthFirst_kn0zno$', function (p, visitor) {
-        var x = p.first;
-        var y = p.second;
-        var stack = new _.Stack();
-        var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-        stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, this.get_vux9f0$(x, y)));
-        while (!stack.isEmpty) {
-          var p_0 = stack.pop();
-          if (visited.contains_za3rmp$(p_0))
-            continue;
-          var c = visitor(p_0);
-          Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p_0);
-          if (c) {
-            var tmp$0 = p_0.position
-            , nx = tmp$0.component1()
-            , ny = tmp$0.component2();
-            var tmp$1;
-            tmp$1 = this.neighbors_vux9f0$(nx, ny).iterator();
-            while (tmp$1.hasNext()) {
-              var element = tmp$1.next();
-              stack.push_za3rmp$(element);
-            }
-          }
-        }
-      }),
+        var search = _.Board.depthFirst_j3dvhl$search(visited, visitor, this);
+        search(new _.PositionValue(new Kotlin.modules['stdlib'].kotlin.Pair(x, y), this.get_vux9f0$(x, y)));
+      },
+      depthFirst_kn0zno$: function (p, visitor) {
+        this.depthFirst_j3dvhl$(p.first, p.second, visitor);
+      },
       toString: function () {
         return Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$(this.rowsList, ',  ', '[ ', ' ]', void 0, void 0, _.Board.toString$f);
       },
@@ -383,6 +331,25 @@
         }, /** @lends _.Board.withIndex$f.iterator$f */ {
         })
       }),
+      depthFirst_j3dvhl$search: function (closure$visited, closure$visitor, this$Board) {
+        return function closure$search(p) {
+          if (closure$visited.contains_za3rmp$(p.position))
+            return;
+          var c = closure$visitor(p);
+          Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(closure$visited, p.position);
+          if (c) {
+            var tmp$0 = p.position
+            , nx = tmp$0.component1()
+            , ny = tmp$0.component2();
+            var tmp$1;
+            tmp$1 = this$Board.neighbors_vux9f0$(nx, ny).iterator();
+            while (tmp$1.hasNext()) {
+              var element = tmp$1.next();
+              closure$search(element);
+            }
+          }
+        };
+      },
       toString$f: function (it) {
         return Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$(it);
       }
@@ -428,6 +395,7 @@
       var counter = {v: 0};
       var button = _.Nurikabe.Nurikabe$button(counter, this, solver);
       button.call(this.debug_ugmehw$, 'Next step', false, _.Nurikabe.Nurikabe$f_5);
+      button.call(this.debug_ugmehw$, 'Apply all', false, _.Nurikabe.Nurikabe$f_6(solver));
     }, /** @lends _.Nurikabe.prototype */ {
       rows: {
         get: function () {
@@ -439,9 +407,12 @@
           return _.floor_yrwdxs$(this.columnsInput_v312bg$.valueAsNumber);
         }
       },
-      update: function () {
+      loadBoard_dvdyvu$: function (board) {
         var tmp$0;
-        this.board = _.Board_init_qt1joh$(this.rows, this.columns, 0);
+        this.dirty_ugjip1$ = true;
+        this.rowsInput_9llf0m$.valueAsNumber = board.rows;
+        this.columnsInput_v312bg$.valueAsNumber = board.columns;
+        this.board = board;
         this.tbody_u7vcpt$.remove();
         this.tbody_u7vcpt$ = Kotlin.isType(tmp$0 = this.table_u7w961$.createTBody(), HTMLTableSectionElement) ? tmp$0 : Kotlin.throwCCE();
         var tmp$1;
@@ -460,9 +431,13 @@
             var x = index_0++;
             var tmp$2;
             var td = Kotlin.isType(tmp$2 = Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(tr, 'td', void 0, _.Nurikabe.f_0), HTMLElement) ? tmp$2 : Kotlin.throwCCE();
-            td.onmouseup = _.Nurikabe.f_1(this, x, y);
+            td.onmouseup = _.Nurikabe.f_1(board, x, y, this);
           }
         }
+      },
+      update: function () {
+        this.loadBoard_dvdyvu$(_.Board_init_qt1joh$(this.rows, this.columns, 0));
+        this.refresh();
         this.next_39onau$.style.visibility = 'hidden';
       },
       refresh: function () {
@@ -487,17 +462,47 @@
             tmp$1 = 'white';
           tmp$2.className = tmp$1;
         }
+      },
+      example1: function () {
+        var board = _.Board_init_qt1joh$(11, 9, 0);
+        board.set_qt1joh$(0, 0, 1);
+        board.set_qt1joh$(7, 0, 1);
+        board.set_qt1joh$(1, 1, 4);
+        board.set_qt1joh$(4, 1, 1);
+        board.set_qt1joh$(8, 2, 2);
+        board.set_qt1joh$(5, 3, 9);
+        board.set_qt1joh$(1, 5, 11);
+        board.set_qt1joh$(7, 5, 3);
+        board.set_qt1joh$(6, 7, 1);
+        board.set_qt1joh$(3, 8, 1);
+        board.set_qt1joh$(7, 8, 2);
+        board.set_qt1joh$(0, 9, 9);
+        board.set_qt1joh$(8, 10, 1);
+        return board;
+      },
+      example2: function () {
+        var board = _.Board_init_qt1joh$(11, 9, 0);
+        board.set_qt1joh$(7, 0, 2);
+        board.set_qt1joh$(0, 1, 2);
+        board.set_qt1joh$(5, 1, 2);
+        board.set_qt1joh$(1, 4, 38);
+        board.set_qt1joh$(4, 4, 1);
+        board.set_qt1joh$(3, 5, 2);
+        board.set_qt1joh$(5, 6, 3);
+        board.set_qt1joh$(4, 8, 1);
+        board.set_qt1joh$(0, 9, 2);
+        return board;
       }
     }, /** @lends _.Nurikabe */ {
       f: function () {
       },
       f_0: function () {
       },
-      f_1: function (this$Nurikabe, closure$x, closure$y) {
+      f_1: function (closure$board, closure$x, closure$y, this$Nurikabe) {
         return function (e) {
           var tmp$0, tmp$1, tmp$2, tmp$3, tmp$4, tmp$5, tmp$6, tmp$7, tmp$8, tmp$9, tmp$10, tmp$11;
           var me = Kotlin.isType(tmp$0 = e, MouseEvent) ? tmp$0 : Kotlin.throwCCE();
-          var value = this$Nurikabe.board.get_vux9f0$(closure$x, closure$y);
+          var value = closure$board.get_vux9f0$(closure$x, closure$y);
           tmp$1 = me.button;
           if (tmp$1 === 0)
             if (value === _.DOT)
@@ -591,6 +596,11 @@
       },
       Nurikabe$f_5: function () {
         this.nextStep();
+      },
+      Nurikabe$f_6: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.applyAll_6taknv$();
+        };
       }
     }),
     white_3ucpiw$f: function (it) {
@@ -604,6 +614,12 @@
     },
     dot_3ucpiw$: function ($receiver) {
       return Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$($receiver.withIndex(), _.dot_3ucpiw$f);
+    },
+    whiteOrDot_3ucpiw$f: function (it) {
+      return it.value === _.DOT || it.value >= 0;
+    },
+    whiteOrDot_3ucpiw$: function ($receiver) {
+      return Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$($receiver.withIndex(), _.whiteOrDot_3ucpiw$f);
     },
     black_3ucpiw$f: function (it) {
       return it.value === _.BLACK;
@@ -655,7 +671,7 @@
       if (previousNumber === void 0)
         previousNumber = -1;
       if (triedBefore === void 0)
-        triedBefore = Kotlin.modules['stdlib'].kotlin.collections.emptyList();
+        triedBefore = Kotlin.modules['stdlib'].kotlin.collections.emptySet();
       this.board = board;
       this.numbers = numbers;
       this.totalWhiteCount = totalWhiteCount;
@@ -668,11 +684,11 @@
       copy: function () {
         return new _.SolverState(this.board.copy(), this.numbers, this.totalWhiteCount, Kotlin.modules['stdlib'].kotlin.collections.toMutableList_mwto7b$(this.toGo));
       },
-      copy_99v8ex$: function (previousNumber, triedBefore) {
+      copy_8mkkoj$: function (previousNumber, triedBefore) {
         if (previousNumber === void 0)
           previousNumber = -1;
         if (triedBefore === void 0)
-          triedBefore = Kotlin.modules['stdlib'].kotlin.collections.emptyList();
+          triedBefore = Kotlin.modules['stdlib'].kotlin.collections.emptySet();
         return new _.SolverState(this.board.copy(), this.numbers, this.totalWhiteCount, Kotlin.modules['stdlib'].kotlin.collections.toMutableList_mwto7b$(this.toGo), void 0, void 0, previousNumber, triedBefore);
       },
       current: {
@@ -741,12 +757,16 @@
           _.trace_za3rmp$('Fail sum');
           return Kotlin.modules['stdlib'].kotlin.collections.emptyList();
         }
+        if (!this.canExpandDots()) {
+          _.trace_za3rmp$('Fail expand dots');
+          return Kotlin.modules['stdlib'].kotlin.collections.emptyList();
+        }
         var tmp$5;
         tmp$5 = hungry.iterator();
         while (tmp$5.hasNext()) {
           var element_0 = tmp$5.next();
           if (!this.canExpand(element_0.first)) {
-            _.trace_za3rmp$('Fail expand');
+            _.trace_za3rmp$('Fail expand hungry');
             return Kotlin.modules['stdlib'].kotlin.collections.emptyList();
           }
         }
@@ -761,17 +781,14 @@
           accumulator = pair1.second < pair2.second ? pair1 : pair2;
         }
         var firstHungry = accumulator.first;
-        var triedBefore = Kotlin.modules['stdlib'].kotlin.collections.toMutableList_mwto7b$(this.triedBefore);
-        var candidates = yellow;
-        if (firstHungry === this.previousNumber) {
-          candidates = Kotlin.modules['stdlib'].kotlin.collections.minus_71wgqg$(candidates, triedBefore);
-          triedBefore.addAll_wtfk93$(triedBefore);
-        }
+        var triedBefore = Kotlin.modules['stdlib'].kotlin.collections.toMutableSet_q5oq31$(this.triedBefore);
+        var candidates = Kotlin.modules['stdlib'].kotlin.collections.toMutableSet_q5oq31$(yellow);
+        if (firstHungry === this.previousNumber)
+          Kotlin.modules['stdlib'].kotlin.collections.minusAssign_fwwv5a$(candidates, triedBefore);
         var result = Kotlin.modules['stdlib'].kotlin.collections.mutableListOf_9mqe4v$([]);
-        var $receiver_3 = candidates;
         var destination_1 = new Kotlin.ArrayList();
         var tmp$6;
-        tmp$6 = $receiver_3.iterator();
+        tmp$6 = candidates.iterator();
         while (tmp$6.hasNext()) {
           var element_1 = tmp$6.next();
           var $receiver_4 = this.board.neighbors_bunuun$(element_1);
@@ -803,11 +820,11 @@
       },
       hasBoxes: function () {
         var tmp$0, tmp$1;
-        tmp$0 = this.board.columns - 1;
+        tmp$0 = this.board.columns - 2;
         for (var x = 0; x <= tmp$0; x++) {
-          tmp$1 = this.board.rows - 1;
+          tmp$1 = this.board.rows - 2;
           for (var y = 0; y <= tmp$1; y++) {
-            var tmp$2 = _.isBlackOrYellow_s8ev3o$(this.board.get_vux9f0$(x, y));
+            var tmp$2 = this.board.get_vux9f0$(x, y) === _.BLACK;
             if (tmp$2) {
               var $receiver = this.board.neighborsSE_vux9f0$(x, y);
               var destination = new Kotlin.ArrayList();
@@ -815,7 +832,7 @@
               tmp$3 = $receiver.iterator();
               while (tmp$3.hasNext()) {
                 var element = tmp$3.next();
-                if (_.isBlackOrYellow_s8ev3o$(element.value)) {
+                if (element.value === _.BLACK) {
                   destination.add_za3rmp$(element);
                 }
               }
@@ -841,42 +858,21 @@
         return this.inL_1(p.first, p.second);
       },
       canExpand: function (n) {
-        var c;
-        var counter = {v: -1};
-        var $this = this.board;
-        var p = this.numbers.get_za3lpa$(n).position;
-        var x = p.first;
-        var y = p.second;
-        var stack = new _.Stack();
-        var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-        stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $this.get_vux9f0$(x, y)));
-        while (!stack.isEmpty) {
-          var p_0 = stack.pop();
-          if (visited.contains_za3rmp$(p_0))
-            continue;
-          visitor$break: {
-            var value = p_0.value;
-            if (value === n || value === _.YELLOW || value === _.DOT) {
-              counter.v++;
-              c = true;
-              break visitor$break;
-            }
-            c = false;
-          }
-          Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p_0);
-          if (c) {
-            var tmp$0 = p_0.position
-            , nx = tmp$0.component1()
-            , ny = tmp$0.component2();
-            var tmp$1;
-            tmp$1 = $this.neighbors_vux9f0$(nx, ny).iterator();
-            while (tmp$1.hasNext()) {
-              var element = tmp$1.next();
-              stack.push_za3rmp$(element);
-            }
-          }
-        }
+        var counter = {v: 0};
+        this.board.depthFirst_kn0zno$(this.numbers.get_za3lpa$(n).position, _.SolverState.canExpand$f(counter, n));
         return counter.v >= this.toGo.get_za3lpa$(n);
+      },
+      canExpandDots: function () {
+        var visitedDots = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
+        var canExpandDot = _.SolverState.canExpandDots$canExpandDot(visitedDots, this);
+        var tmp$0;
+        tmp$0 = _.dot_3ucpiw$(this.board).iterator();
+        while (tmp$0.hasNext()) {
+          var element = tmp$0.next();
+          if (!canExpandDot(element.position))
+            return false;
+        }
+        return true;
       },
       checkIfSolved: function () {
         if (!this.connected()) {
@@ -884,7 +880,7 @@
           _.trace_za3rmp$('Fail connected');
           return;
         }
-        this.solved = (!this.hasBoxes() && Kotlin.modules['stdlib'].kotlin.collections.sum_q1ah1m$(this.toGo) === 0 && Kotlin.modules['stdlib'].kotlin.sequences.count_uya9q7$(_.dot_3ucpiw$(this.board)) === 0);
+        this.solved = (!this.hasBoxes() && Kotlin.modules['stdlib'].kotlin.collections.sum_q1ah1m$(this.toGo) === 0 && Kotlin.modules['stdlib'].kotlin.sequences.count_uya9q7$(_.yellow_3ucpiw$(this.board)) === 0 && Kotlin.modules['stdlib'].kotlin.sequences.count_uya9q7$(_.dot_3ucpiw$(this.board)) === 0);
       },
       connected: function () {
         var blacks = Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(this.board.withIndex(), _.SolverState.connected$f);
@@ -894,30 +890,7 @@
         var tmp$0 = Kotlin.modules['stdlib'].kotlin.sequences.first_uya9q7$(blacks).position
         , x = tmp$0.component1()
         , y = tmp$0.component2();
-        var $this = this.board;
-        var stack = new _.Stack();
-        var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-        stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $this.get_vux9f0$(x, y)));
-        while (!stack.isEmpty) {
-          var p = stack.pop();
-          if (visited.contains_za3rmp$(p))
-            continue;
-          if (p.value === _.BLACK)
-            count.v--;
-          var c = _.isBlackOrYellow_s8ev3o$(p.value);
-          Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p);
-          if (c) {
-            var tmp$2 = p.position
-            , nx = tmp$2.component1()
-            , ny = tmp$2.component2();
-            var tmp$1;
-            tmp$1 = $this.neighbors_vux9f0$(nx, ny).iterator();
-            while (tmp$1.hasNext()) {
-              var element = tmp$1.next();
-              stack.push_za3rmp$(element);
-            }
-          }
-        }
+        this.board.depthFirst_j3dvhl$(x, y, _.SolverState.connected$f_0(count));
         return count.v === 0;
       },
       fillNumbers: function () {
@@ -936,11 +909,20 @@
           }
         }
       },
+      paintBlack: function (p) {
+        if (this.inL(p)) {
+          this.fail = true;
+          _.trace_za3rmp$('Fail paint black');
+          return false;
+        }
+        this.board.set_av77s6$(p, _.BLACK);
+        return true;
+      },
       paintNumber_av71ur$: function (p, n) {
-        var $receiver = this.board.neighbors_bunuun$(p);
+        var neighbors = this.board.neighbors_bunuun$(p);
         var destination = new Kotlin.ArrayList();
         var tmp$2;
-        tmp$2 = $receiver.iterator();
+        tmp$2 = neighbors.iterator();
         while (tmp$2.hasNext()) {
           var element = tmp$2.next();
           if (element.value >= 0) {
@@ -954,14 +936,15 @@
           var item = tmp$3.next();
           destination_0.add_za3rmp$(item.value);
         }
-        var neighbors = Kotlin.modules['stdlib'].kotlin.collections.distinct_q5oq31$(destination_0);
-        if (neighbors.size > 1) {
+        var white = Kotlin.modules['stdlib'].kotlin.collections.distinct_q5oq31$(destination_0);
+        if (white.size > 1) {
           this.fail = true;
-          _.trace_za3rmp$('Fail fill number');
-          return;
+          _.trace_za3rmp$('Fail paint number');
+          return false;
         }
         this.board.set_av77s6$(p, n);
         this.fillNumbers();
+        return true;
       },
       paintDot_bunuun$: function (p) {
         var $receiver = this.board.neighbors_bunuun$(p);
@@ -985,10 +968,11 @@
         if (neighbors.size > 1) {
           this.fail = true;
           _.trace_za3rmp$('Fail paint dot');
-          return;
+          return false;
         }
         this.board.set_av77s6$(p, _.DOT);
         this.fillNumbers();
+        return true;
       },
       techn0: function () {
         var tmp$0;
@@ -1014,7 +998,7 @@
           var canReach = accumulator;
           if (!canReach) {
             if (_.isBlackOrYellow_s8ev3o$(this.board.get_bunuun$(element.position)))
-              this.board.set_av77s6$(element.position, _.BLACK);
+              this.paintBlack(element.position);
             else {
               this.fail = true;
               return;
@@ -1046,9 +1030,9 @@
             }
           }
           var whites = Kotlin.modules['stdlib'].kotlin.collections.distinct_q5oq31$(destination_0);
-          if (whites.size >= 2 || (whites.size === 1 && this.full(Kotlin.modules['stdlib'].kotlin.collections.first_a7ptmv$(whites)))) {
-            changes.v++;
-            this.board.set_av77s6$(element.position, _.BLACK);
+          if (this.board.get_bunuun$(element.position) === _.YELLOW && whites.size >= 2 || (whites.size === 1 && this.full(Kotlin.modules['stdlib'].kotlin.collections.first_a7ptmv$(whites)))) {
+            if (this.paintBlack(element.position))
+              changes.v++;
           }
         }
         return changes.v;
@@ -1079,8 +1063,8 @@
           }
           var blacks = destination_0;
           if (blacks.size === neighbors.size) {
-            changes.v++;
-            this.board.set_av77s6$(element.position, _.BLACK);
+            if (this.paintBlack(element.position))
+              changes.v++;
           }
         }
         return changes.v;
@@ -1119,9 +1103,10 @@
             var first = Kotlin.modules['stdlib'].kotlin.collections.firstOrNull_a7ptmv$(neighbors);
             if (neighbors.size === 1 && first != null) {
               if (this.board.get_bunuun$(first) === _.YELLOW) {
-                changes.v++;
-                this.board.set_av77s6$(first, _.BLACK);
-                blacksToGo.v--;
+                if (this.paintBlack(first)) {
+                  changes.v++;
+                  blacksToGo.v--;
+                }
               }
               parent = current;
               current = first;
@@ -1135,7 +1120,7 @@
       techn4: function () {
         var changes = {v: 0};
         var tmp$0;
-        tmp$0 = _.white_3ucpiw$(this.board).iterator();
+        tmp$0 = _.whiteOrDot_3ucpiw$(this.board).iterator();
         while (tmp$0.hasNext()) {
           var element = tmp$0.next();
           action$break: {
@@ -1166,8 +1151,11 @@
               var first = Kotlin.modules['stdlib'].kotlin.collections.firstOrNull_a7ptmv$(neighbors);
               if (neighbors.size === 1 && first != null && (this.board.get_bunuun$(first) === value || this.board.get_bunuun$(first) === _.YELLOW)) {
                 if (this.board.get_bunuun$(first) === _.YELLOW) {
-                  changes.v++;
-                  this.paintNumber_av71ur$(first, value);
+                  if (value === _.DOT)
+                    if (this.paintDot_bunuun$(first))
+                      changes.v++;
+                    else if (this.paintNumber_av71ur$(first, value))
+                      changes.v++;
                 }
                 parent = current;
                 current = first;
@@ -1189,47 +1177,15 @@
           tmp$0 = _.yellow_3ucpiw$(this.board).iterator();
           while (tmp$0.hasNext()) {
             var element = tmp$0.next();
-            var c_0;
             var p = element.position;
             var c = {v: count.v};
             this.board.set_av77s6$(p, _.DOT);
-            var $this = this.board;
-            var p_0 = first.position;
-            var x = p_0.first;
-            var y = p_0.second;
-            var stack = new _.Stack();
-            var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-            stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $this.get_vux9f0$(x, y)));
-            while (!stack.isEmpty) {
-              var p_1 = stack.pop();
-              if (visited.contains_za3rmp$(p_1))
-                continue;
-              visitor$break: {
-                if (_.isBlackOrYellow_s8ev3o$(p_1.value)) {
-                  if (p_1.value === _.BLACK)
-                    c.v--;
-                  c_0 = true;
-                  break visitor$break;
-                }
-                c_0 = false;
-              }
-              Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p_1);
-              if (c_0) {
-                var tmp$2 = p_1.position
-                , nx = tmp$2.component1()
-                , ny = tmp$2.component2();
-                var tmp$1;
-                tmp$1 = $this.neighbors_vux9f0$(nx, ny).iterator();
-                while (tmp$1.hasNext()) {
-                  var element_0 = tmp$1.next();
-                  stack.push_za3rmp$(element_0);
-                }
-              }
-            }
+            this.board.depthFirst_kn0zno$(first.position, _.SolverState.f_12(c));
             if (c.v !== 0) {
-              changes.v++;
-              this.board.set_av77s6$(p, _.BLACK);
-              count.v++;
+              if (this.paintBlack(p)) {
+                changes.v++;
+                count.v++;
+              }
             }
              else
               this.board.set_av77s6$(p, _.YELLOW);
@@ -1245,51 +1201,47 @@
           var element = tmp$0.next();
           var p = element.position;
           if (this.inL(p)) {
-            this.paintDot_bunuun$(p);
-            changes.v++;
+            if (this.paintDot_bunuun$(p))
+              changes.v++;
           }
         }
         return changes.v;
       },
       techn7: function () {
         var changes = {v: 0};
-        var $receiver = this.numbers;
-        var destination = new Kotlin.ArrayList();
-        var tmp$1;
-        tmp$1 = $receiver.iterator();
-        while (tmp$1.hasNext()) {
-          var element = tmp$1.next();
-          if (element.value === 2) {
-            destination.add_za3rmp$(element);
-          }
-        }
-        var tmp$2;
-        tmp$2 = destination.iterator();
-        while (tmp$2.hasNext()) {
-          var element_0 = tmp$2.next();
-          var numPos = element_0.position;
-          var $receiver_1 = this.board.neighbors_bunuun$(numPos);
-          var destination_0 = new Kotlin.ArrayList();
-          var tmp$3;
-          tmp$3 = $receiver_1.iterator();
-          while (tmp$3.hasNext()) {
-            var element_1 = tmp$3.next();
-            if (element_1.value === _.YELLOW) {
-              destination_0.add_za3rmp$(element_1);
+        var tmp$0;
+        var index = 0;
+        tmp$0 = this.numbers.iterator();
+        while (tmp$0.hasNext()) {
+          var item = tmp$0.next();
+          var i = index++;
+          action$break: {
+            if (item.value !== 2 || this.toGo.get_za3lpa$(i) === 0)
+              break action$break;
+            var numPos = item.position;
+            var $receiver_0 = this.board.neighbors_bunuun$(numPos);
+            var destination = new Kotlin.ArrayList();
+            var tmp$1;
+            tmp$1 = $receiver_0.iterator();
+            while (tmp$1.hasNext()) {
+              var element = tmp$1.next();
+              if (element.value === _.YELLOW) {
+                destination.add_za3rmp$(element);
+              }
             }
-          }
-          var neighbors = destination_0;
-          if (neighbors.size === 2) {
-            var first = neighbors.get_za3lpa$(0).position;
-            var second = neighbors.get_za3lpa$(1).position;
-            var dx = first.first - second.first;
-            var dy = first.second - second.second;
-            if (_.abs_s8ev3o$(dx) === 1 && _.abs_s8ev3o$(dy) === 1) {
-              var x = numPos.first !== first.first ? first.first : second.first;
-              var y = numPos.second !== first.second ? first.second : second.second;
-              if (this.board.get_vux9f0$(x, y) === _.YELLOW) {
-                this.board.set_qt1joh$(x, y, _.BLACK);
-                changes.v++;
+            var neighbors = destination;
+            if (neighbors.size === 2) {
+              var first = neighbors.get_za3lpa$(0).position;
+              var second = neighbors.get_za3lpa$(1).position;
+              var dx = first.first - second.first;
+              var dy = first.second - second.second;
+              if (_.abs_s8ev3o$(dx) === 1 && _.abs_s8ev3o$(dy) === 1) {
+                var x = numPos.first !== first.first ? first.first : second.first;
+                var y = numPos.second !== first.second ? first.second : second.second;
+                if (this.board.get_vux9f0$(x, y) === _.YELLOW) {
+                  if (this.paintBlack(new Kotlin.modules['stdlib'].kotlin.Pair(x, y)))
+                    changes.v++;
+                }
               }
             }
           }
@@ -1299,10 +1251,13 @@
       applyAll_6taknv$: function (zero) {
         if (zero === void 0)
           zero = true;
+        var loops = 0;
         if (zero)
           this.techn0();
         do {
-          var changes = this.techn1() + this.techn2() + this.techn3() + this.techn4() + this.techn5() + this.techn6() + this.techn7();
+          loops++;
+          var changes = this.techn1() + this.techn2();
+          this.techn6() + this.techn7() + this.techn4() + this.techn3() + this.techn5();
         }
          while (changes > 0);
       }
@@ -1313,7 +1268,7 @@
       f_0: function (closure$it, closure$triedBefore, this$SolverState, closure$firstHungry) {
         return function () {
           Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(closure$triedBefore, closure$it);
-          var state = this$SolverState.copy_99v8ex$(closure$firstHungry, Kotlin.modules['stdlib'].kotlin.collections.toList_q5oq31$(closure$triedBefore));
+          var state = this$SolverState.copy_8mkkoj$(closure$firstHungry, closure$triedBefore);
           state.paintNumber_av71ur$(closure$it, closure$firstHungry);
           return state;
         };
@@ -1330,45 +1285,90 @@
         }
         return destination;
       },
+      canExpand$f: function (closure$counter, closure$n) {
+        return function (it) {
+          var value = it.value;
+          if (value === _.YELLOW || value === _.DOT)
+            closure$counter.v++;
+          return value === closure$n || value === _.YELLOW || value === _.DOT;
+        };
+      },
+      canExpandDot$f: function (closure$visitedDots, closure$canExpand) {
+        return function (it) {
+          if (it.value === _.DOT)
+            closure$visitedDots.add_za3rmp$(it.position);
+          if (it.value === _.YELLOW) {
+            closure$canExpand.v = true;
+          }
+          return it.value === _.DOT;
+        };
+      },
+      canExpandDots$canExpandDot: function (closure$visitedDots, this$SolverState) {
+        return function (p) {
+          if (closure$visitedDots.contains_za3rmp$(p))
+            return true;
+          var canExpand = {v: false};
+          this$SolverState.board.depthFirst_kn0zno$(p, _.SolverState.canExpandDot$f(closure$visitedDots, canExpand));
+          return canExpand.v;
+        };
+      },
       connected$f: function (it) {
         return it.value === _.BLACK;
+      },
+      connected$f_0: function (closure$count) {
+        return function (it) {
+          if (it.value === _.BLACK) {
+            closure$count.v--;
+          }
+          return _.isBlackOrYellow_s8ev3o$(it.value);
+        };
       },
       f_1: function (closure$i) {
         return function (it) {
           return it === closure$i || it === _.DOT;
+        };
+      },
+      f_12: function (closure$c) {
+        return function (it) {
+          if (_.isBlackOrYellow_s8ev3o$(it.value)) {
+            if (it.value === _.BLACK)
+              closure$c.v--;
+            return true;
+          }
+          return false;
         };
       }
     }),
     Solver: Kotlin.createClass(null, function (input) {
       this.numbers_934qrz$ = Kotlin.modules['stdlib'].kotlin.sequences.toList_uya9q7$(Kotlin.modules['stdlib'].kotlin.sequences.filter_6bub1b$(input.withIndex(), _.Solver.numbers_934qrz$f));
       this.stack_n7x7v1$ = new _.Stack();
-      this.currentState_ab6rn7$ = new _.SolverState(input.copy(), this.numbers_934qrz$);
+      this.currentState = new _.SolverState(input.copy(), this.numbers_934qrz$);
       this.previousSolutions_f3e5t4$ = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
       var tmp$0;
-      tmp$0 = _.white_3ucpiw$(this.currentState_ab6rn7$.board).iterator();
+      tmp$0 = _.white_3ucpiw$(this.currentState.board).iterator();
       while (tmp$0.hasNext()) {
         var element = tmp$0.next();
-        this.currentState_ab6rn7$.board.set_av77s6$(element.position, _.YELLOW);
+        this.currentState.board.set_av77s6$(element.position, _.YELLOW);
       }
       var tmp$1;
       var index = 0;
-      tmp$1 = this.currentState_ab6rn7$.numbers.iterator();
+      tmp$1 = this.currentState.numbers.iterator();
       while (tmp$1.hasNext()) {
         var item = tmp$1.next();
-        this.currentState_ab6rn7$.board.set_av77s6$(item.position, index++);
+        this.currentState.board.set_av77s6$(item.position, index++);
       }
-      this.currentState_ab6rn7$.fillNumbers();
-      this.currentState_ab6rn7$.techn0();
+      this.currentState.fillNumbers();
+      this.currentState.techn0();
       this.stack_n7x7v1$.push_za3rmp$(Kotlin.modules['stdlib'].kotlin.lazy_un3fny$(_.Solver.Solver$f_1(this)));
     }, /** @lends _.Solver.prototype */ {
       current: {
         get: function () {
-          return this.currentState_ab6rn7$.current;
+          return this.currentState.current;
         }
       },
       nextSolution: function () {
         while (this.nextStep()) {
-          if (this.currentState_ab6rn7$.solved && !this.previousSolutions_f3e5t4$.contains_za3rmp$(this.current)) {
+          if (this.currentState.solved && !this.previousSolutions_f3e5t4$.contains_za3rmp$(this.current)) {
             this.previousSolutions_f3e5t4$.add_za3rmp$(this.current);
             return this.current;
           }
@@ -1379,7 +1379,7 @@
         if (this.stack_n7x7v1$.isEmpty)
           return false;
         var state = this.stack_n7x7v1$.pop().value;
-        this.currentState_ab6rn7$ = state;
+        this.currentState = state;
         var candidates = state.nextStep();
         var tmp$0;
         tmp$0 = candidates.iterator();
@@ -1395,7 +1395,7 @@
       },
       Solver$f_1: function (this$Solver) {
         return function () {
-          return this$Solver.currentState_ab6rn7$;
+          return this$Solver.currentState;
         };
       }
     }),
@@ -1415,7 +1415,7 @@
         }
       },
       peek: function () {
-        return Kotlin.modules['stdlib'].kotlin.collections.last_a7ptmv$(this.list_54ut98$);
+        return this.list_54ut98$.get_za3lpa$(this.list_54ut98$.size - 1);
       },
       push_za3rmp$: function (element) {
         Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(this.list_54ut98$, element);
@@ -1433,112 +1433,32 @@
     abs_s8ev3o$: function ($receiver) {
       return $receiver > 0 ? $receiver : -$receiver;
     },
-    fill_ulgjb3$: Kotlin.defineInlineFunction('nurikabe.fill_ulgjb3$', function ($receiver, x, y, color, toReplace) {
-      var c;
+    fill_ulgjb3$f: function (closure$toReplace, closure$filled, closure$color, this$fill) {
+      return function (it) {
+        if (closure$toReplace(it.value)) {
+          closure$filled.v++;
+          this$fill.set_av77s6$(it.position, closure$color);
+          return true;
+        }
+        return false;
+      };
+    },
+    fill_ulgjb3$: function ($receiver, x, y, color, toReplace) {
       var filled = {v: 0};
-      var stack = new _.Stack();
-      var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-      stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $receiver.get_vux9f0$(x, y)));
-      while (!stack.isEmpty) {
-        var p = stack.pop();
-        if (visited.contains_za3rmp$(p))
-          continue;
-        visitor$break: {
-          if (toReplace(p.value)) {
-            filled.v++;
-            $receiver.set_av77s6$(p.position, color);
-            c = true;
-            break visitor$break;
-          }
-          c = false;
-        }
-        Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p);
-        if (c) {
-          var tmp$0 = p.position
-          , nx = tmp$0.component1()
-          , ny = tmp$0.component2();
-          var tmp$1;
-          tmp$1 = $receiver.neighbors_vux9f0$(nx, ny).iterator();
-          while (tmp$1.hasNext()) {
-            var element = tmp$1.next();
-            stack.push_za3rmp$(element);
-          }
-        }
-      }
+      $receiver.depthFirst_j3dvhl$(x, y, _.fill_ulgjb3$f(toReplace, filled, color, $receiver));
       return filled.v;
-    }),
+    },
     fill_h8kx0c$: function ($receiver, p, color, toReplace) {
-      var x = p.first;
-      var y = p.second;
-      var c;
-      var filled = {v: 0};
-      var stack = new _.Stack();
-      var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-      stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $receiver.get_vux9f0$(x, y)));
-      while (!stack.isEmpty) {
-        var p_0 = stack.pop();
-        if (visited.contains_za3rmp$(p_0))
-          continue;
-        visitor$break: {
-          if (toReplace(p_0.value)) {
-            filled.v++;
-            $receiver.set_av77s6$(p_0.position, color);
-            c = true;
-            break visitor$break;
-          }
-          c = false;
-        }
-        Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p_0);
-        if (c) {
-          var tmp$0 = p_0.position
-          , nx = tmp$0.component1()
-          , ny = tmp$0.component2();
-          var tmp$1;
-          tmp$1 = $receiver.neighbors_vux9f0$(nx, ny).iterator();
-          while (tmp$1.hasNext()) {
-            var element = tmp$1.next();
-            stack.push_za3rmp$(element);
-          }
-        }
-      }
-      return filled.v;
+      return _.fill_ulgjb3$($receiver, p.first, p.second, color, toReplace);
+    },
+    fill_m7i36t$f: function (closure$toReplace) {
+      return function (it) {
+        return it === closure$toReplace;
+      };
     },
     fill_m7i36t$: function ($receiver, p, color) {
       var toReplace = $receiver.get_bunuun$(p);
-      var x = p.first;
-      var y = p.second;
-      var c;
-      var filled = {v: 0};
-      var stack = new _.Stack();
-      var visited = Kotlin.modules['stdlib'].kotlin.collections.mutableSetOf_9mqe4v$([]);
-      stack.push_za3rmp$(_.PositionValue_init_qt1joh$(x, y, $receiver.get_vux9f0$(x, y)));
-      while (!stack.isEmpty) {
-        var p_0 = stack.pop();
-        if (visited.contains_za3rmp$(p_0))
-          continue;
-        visitor$break: {
-          if (p_0.value === toReplace) {
-            filled.v++;
-            $receiver.set_av77s6$(p_0.position, color);
-            c = true;
-            break visitor$break;
-          }
-          c = false;
-        }
-        Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(visited, p_0);
-        if (c) {
-          var tmp$0 = p_0.position
-          , nx = tmp$0.component1()
-          , ny = tmp$0.component2();
-          var tmp$1;
-          tmp$1 = $receiver.neighbors_vux9f0$(nx, ny).iterator();
-          while (tmp$1.hasNext()) {
-            var element = tmp$1.next();
-            stack.push_za3rmp$(element);
-          }
-        }
-      }
-      return filled.v;
+      return _.fill_ulgjb3$($receiver, p.first, p.second, color, _.fill_m7i36t$f(toReplace));
     }
   });
   Kotlin.defineModule('nurikabe', _);
