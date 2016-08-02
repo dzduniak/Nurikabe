@@ -181,7 +181,7 @@ class Nurikabe() {
         debug.button { techn6() }
         debug.button { techn7() }*/
 
-        /*loadBoard(example2())
-        refresh()*/
+        loadBoard(example2())
+        refresh()
     }
 }

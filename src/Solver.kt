@@ -11,7 +11,7 @@ fun Int.isBlackOrYellow() = this == BLACK || this == YELLOW
 fun distance(p1: Pair<Int, Int>, p2: Pair<Int, Int>) =
         (p1.first - p2.first).abs() + (p1.second - p2.second).abs()
 
-var debug: Boolean = true
+var debug: Boolean = false
 fun trace(s: Any?) {
     if (debug)
         println(s)
