@@ -351,12 +351,13 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
                 val first = neighbors.firstOrNull()
                 if (neighbors.size == 1 && first != null && (board[first] == value || board[first] == YELLOW)) {
                     if (board[first] == YELLOW) {
-                        if (value == DOT)
+                        if (value == DOT) {
                             if (paintDot(first))
                                 changes++
-                            else
-                                if (paintNumber(first, value))
-                                    changes++
+                        } else {
+                            if (paintNumber(first, value))
+                                changes++
+                        }
                     }
                     parent = current
                     current = first
@@ -445,12 +446,9 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
     }
 
     fun applyAll(zero: Boolean = true) {
-        var loops = 0
         if (zero) techn0()
         do {
-            loops++
-            val changes = techn1() + techn2()
-            techn6() + techn7() + techn4() + techn3() + techn5()
+            val changes = techn1() + techn2() + techn3() + techn4() + techn5() + techn6() + techn7()
         } while (changes > 0)
     }
 }

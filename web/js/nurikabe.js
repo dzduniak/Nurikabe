@@ -371,7 +371,7 @@
       new _.Nurikabe();
     },
     Nurikabe: Kotlin.createClass(null, function () {
-      var tmp$0, tmp$1, tmp$2, tmp$3, tmp$4, tmp$5, tmp$6, tmp$7, tmp$8;
+      var tmp$0, tmp$1, tmp$2, tmp$3, tmp$4, tmp$5, tmp$6, tmp$7, tmp$8, tmp$9;
       this.rowsInput_9llf0m$ = Kotlin.isType(tmp$0 = document.getElementById('rows'), HTMLInputElement) ? tmp$0 : Kotlin.throwCCE();
       this.columnsInput_v312bg$ = Kotlin.isType(tmp$1 = document.getElementById('columns'), HTMLInputElement) ? tmp$1 : Kotlin.throwCCE();
       this.solve_u86wag$ = Kotlin.isType(tmp$2 = document.getElementById('solve'), HTMLButtonElement) ? tmp$2 : Kotlin.throwCCE();
@@ -393,11 +393,21 @@
       Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this.solve_u86wag$, void 0, _.Nurikabe.Nurikabe$f_3(solve));
       Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this.next_39onau$, void 0, _.Nurikabe.Nurikabe$f_4(solve));
       var counter = {v: 0};
-      var button = _.Nurikabe.Nurikabe$button(counter, this, solver);
-      button.call(this.debug_ugmehw$, 'Next step', false, _.Nurikabe.Nurikabe$f_5);
-      button.call(this.debug_ugmehw$, 'Apply all', false, _.Nurikabe.Nurikabe$f_6(solver));
-      Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this.debug_ugmehw$, 'button', void 0, _.Nurikabe.Nurikabe$f_7(this));
-      document.addEventListener('paste', _.Nurikabe.Nurikabe$f_8(this));
+      var button = _.Nurikabe.Nurikabe$button(this, solver, counter);
+      var showDebug = Kotlin.isType(tmp$9 = document.getElementById('showdebug'), HTMLElement) ? tmp$9 : Kotlin.throwCCE();
+      Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(showDebug, void 0, _.Nurikabe.Nurikabe$f_5(this, showDebug));
+      button.call(this.debug_ugmehw$, 'Next step', _.Nurikabe.Nurikabe$f_6);
+      button.call(this.debug_ugmehw$, 'Techn0', _.Nurikabe.Nurikabe$f_7(solver));
+      button.call(this.debug_ugmehw$, 'Techn1', _.Nurikabe.Nurikabe$f_8(solver));
+      button.call(this.debug_ugmehw$, 'Techn2', _.Nurikabe.Nurikabe$f_9(solver));
+      button.call(this.debug_ugmehw$, 'Techn3', _.Nurikabe.Nurikabe$f_10(solver));
+      button.call(this.debug_ugmehw$, 'Techn4', _.Nurikabe.Nurikabe$f_11(solver));
+      button.call(this.debug_ugmehw$, 'Techn5', _.Nurikabe.Nurikabe$f_12(solver));
+      button.call(this.debug_ugmehw$, 'Techn6', _.Nurikabe.Nurikabe$f_13(solver));
+      button.call(this.debug_ugmehw$, 'Techn7', _.Nurikabe.Nurikabe$f_14(solver));
+      button.call(this.debug_ugmehw$, 'Apply all', _.Nurikabe.Nurikabe$f_15(solver));
+      Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this.debug_ugmehw$, 'button', void 0, _.Nurikabe.Nurikabe$f_16(this));
+      document.addEventListener('paste', _.Nurikabe.Nurikabe$f_17(this));
     }, /** @lends _.Nurikabe.prototype */ {
       rows: {
         get: function () {
@@ -576,30 +586,73 @@
           this$Nurikabe.dirty_ugjip1$ = false;
         };
       },
-      button$f: function (closure$index, closure$string, closure$counter, this$Nurikabe, closure$solver, closure$a) {
+      button$f: function (closure$string, this$Nurikabe, closure$solver, closure$a) {
         return function () {
-          this.textContent = closure$index ? closure$string + ' ' + closure$counter.v : closure$string;
+          this.textContent = closure$string;
           Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this, void 0, _.Nurikabe.f_3(this$Nurikabe, closure$solver, closure$a));
         };
       },
       button$f_0: function () {
         this.className = 'divider';
       },
-      Nurikabe$button: function (closure$counter, this$Nurikabe, closure$solver) {
-        return function (string, index, a) {
-          if (string === void 0)
-            string = 'Technique';
-          if (index === void 0)
-            index = true;
-          Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this, 'button', void 0, _.Nurikabe.button$f(index, string, closure$counter, this$Nurikabe, closure$solver, a));
+      Nurikabe$button: function (this$Nurikabe, closure$solver, closure$counter) {
+        return function (string, a) {
+          Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this, 'button', void 0, _.Nurikabe.button$f(string, this$Nurikabe, closure$solver, a));
           Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this, 'div', void 0, _.Nurikabe.button$f_0);
           closure$counter.v++;
         };
       },
-      Nurikabe$f_5: function () {
+      Nurikabe$f_5: function (this$Nurikabe, closure$showDebug) {
+        return function (e) {
+          e.preventDefault();
+          this$Nurikabe.debug_ugmehw$.style.display = 'block';
+          closure$showDebug.style.display = 'none';
+        };
+      },
+      Nurikabe$f_6: function () {
         this.nextStep();
       },
-      Nurikabe$f_6: function (closure$solver) {
+      Nurikabe$f_7: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn0();
+        };
+      },
+      Nurikabe$f_8: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn1();
+        };
+      },
+      Nurikabe$f_9: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn2();
+        };
+      },
+      Nurikabe$f_10: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn3();
+        };
+      },
+      Nurikabe$f_11: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn4();
+        };
+      },
+      Nurikabe$f_12: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn5();
+        };
+      },
+      Nurikabe$f_13: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn6();
+        };
+      },
+      Nurikabe$f_14: function (closure$solver) {
+        return function () {
+          closure$solver.v.currentState.techn7();
+        };
+      },
+      Nurikabe$f_15: function (closure$solver) {
         return function () {
           closure$solver.v.currentState.applyAll_6taknv$();
         };
@@ -609,19 +662,28 @@
           _.putInClipboard_3ucpiw$(this$Nurikabe.board);
         };
       },
-      Nurikabe$f_7: function (this$Nurikabe) {
+      Nurikabe$f_16: function (this$Nurikabe) {
         return function () {
           this.textContent = 'Copy';
           Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this, void 0, _.Nurikabe.f_4(this$Nurikabe));
         };
       },
-      Nurikabe$f_8: function (this$Nurikabe) {
+      Nurikabe$f_17: function (this$Nurikabe) {
         return function (e) {
           e.preventDefault();
           e.stopPropagation();
           var data = e.clipboardData.getData('text/plain');
-          this$Nurikabe.loadBoard_dvdyvu$(_.parse_61zpoe$(data));
-          this$Nurikabe.refresh();
+          try {
+            this$Nurikabe.loadBoard_dvdyvu$(_.parse_61zpoe$(data));
+            this$Nurikabe.refresh();
+          }
+           catch (e_0) {
+            if (Kotlin.isType(e_0, Kotlin.Exception)) {
+              _.trace_za3rmp$("Couldn't load board.");
+            }
+             else
+              throw e_0;
+          }
         };
       }
     }),
@@ -1173,11 +1235,14 @@
               var first = Kotlin.modules['stdlib'].kotlin.collections.firstOrNull_a7ptmv$(neighbors);
               if (neighbors.size === 1 && first != null && (this.board.get_bunuun$(first) === value || this.board.get_bunuun$(first) === _.YELLOW)) {
                 if (this.board.get_bunuun$(first) === _.YELLOW) {
-                  if (value === _.DOT)
+                  if (value === _.DOT) {
                     if (this.paintDot_bunuun$(first))
                       changes.v++;
-                    else if (this.paintNumber_av71ur$(first, value))
+                  }
+                   else {
+                    if (this.paintNumber_av71ur$(first, value))
                       changes.v++;
+                  }
                 }
                 parent = current;
                 current = first;
@@ -1273,13 +1338,10 @@
       applyAll_6taknv$: function (zero) {
         if (zero === void 0)
           zero = true;
-        var loops = 0;
         if (zero)
           this.techn0();
         do {
-          loops++;
-          var changes = this.techn1() + this.techn2();
-          this.techn6() + this.techn7() + this.techn4() + this.techn3() + this.techn5();
+          var changes = this.techn1() + this.techn2() + this.techn3() + this.techn4() + this.techn5() + this.techn6() + this.techn7();
         }
          while (changes > 0);
       }
@@ -1511,15 +1573,10 @@
         destination.add_za3rmp$(item.value);
       }
       var matches = destination;
-      var tmp$3;
-      tmp$3 = matches.iterator();
-      while (tmp$3.hasNext()) {
-        var element = tmp$3.next();
-        Kotlin.println(element);
-      }
       var cols = parseInt(matches.get_za3lpa$(0));
       var rows = parseInt(matches.get_za3lpa$(1));
-      Kotlin.println(cols.toString() + ' x ' + rows);
+      if (cols * rows !== matches.size - 2)
+        throw new Kotlin.Exception();
       var board = _.Board_init_qt1joh$(rows, cols, 0);
       tmp$0 = board.size - 1;
       for (var i = 0; i <= tmp$0; i++)

@@ -45,10 +45,11 @@ fun parse(string: String): Board<Int> {
     val numbers = string.replace(",", "")
     val regex = Regex("""-?[0-9]+""")
     val matches = regex.findAll(numbers).toList().map { it.value }
-    matches.forEach { println(it) }
     val cols = parseInt(matches[0])
     val rows = parseInt(matches[1])
-    println("$cols x $rows")
+
+    if (cols * rows != matches.size - 2)
+        throw Exception()
 
     val board = Board(rows, cols, 0)
     for (i in 0..board.size - 1)

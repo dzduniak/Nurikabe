@@ -1,4 +1,9 @@
-import org.w3c.dom.*
+import org.w3c.dom.HTMLButtonElement
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLTableElement
+import org.w3c.dom.HTMLTableRowElement
+import org.w3c.dom.HTMLTableSectionElement
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.dom.build.addElement
@@ -154,9 +159,9 @@ class Nurikabe() {
         next.onClick { solve(true) }
 
         var counter = 0
-        fun HTMLElement.button(string: String = "Technique", index: Boolean = true, a: Solver.() -> Unit) {
+        fun HTMLElement.button(string: String, a: Solver.() -> Unit) {
             this.addElement("button") {
-                textContent = if (index) "$string $counter" else string
+                textContent = string
                 onClick {
                     if (dirty)
                         solver = Solver(board)
@@ -170,8 +175,23 @@ class Nurikabe() {
             counter++
         }
 
-        debug.button("Next step", false) { nextStep() }
-        debug.button("Apply all", false) { solver.currentState.applyAll() }
+        val showDebug = document.getElementById("showdebug") as HTMLElement
+        showDebug.onClick { e ->
+            e.preventDefault()
+            debug.style.display = "block"
+            showDebug.style.display = "none"
+        }
+
+        debug.button("Next step") { nextStep() }
+        debug.button("Techn0") { solver.currentState.techn0() }
+        debug.button("Techn1") { solver.currentState.techn1() }
+        debug.button("Techn2") { solver.currentState.techn2() }
+        debug.button("Techn3") { solver.currentState.techn3() }
+        debug.button("Techn4") { solver.currentState.techn4() }
+        debug.button("Techn5") { solver.currentState.techn5() }
+        debug.button("Techn6") { solver.currentState.techn6() }
+        debug.button("Techn7") { solver.currentState.techn7() }
+        debug.button("Apply all") { solver.currentState.applyAll() }
         debug.addElement("button") { textContent = "Copy"; onClick { board.putInClipboard() } }
 
         document.addEventListener("paste", { e ->
@@ -179,20 +199,12 @@ class Nurikabe() {
             e.stopPropagation()
 
             val data = js("e.clipboardData.getData('text/plain');")
-            loadBoard(parse(data))
-            refresh()
+            try {
+                loadBoard(parse(data))
+                refresh()
+            } catch (e: Exception) {
+                trace("Couldn't load board.")
+            }
         })
-
-        /*debug.button { techn0() }
-        debug.button { techn1() }
-        debug.button { techn2() }
-        debug.button { techn3() }
-        debug.button { techn4() }
-        debug.button { techn5() }
-        debug.button { techn6() }
-        debug.button { techn7() }*/
-
-        /*loadBoard(example2())
-        refresh()*/
     }
 }
