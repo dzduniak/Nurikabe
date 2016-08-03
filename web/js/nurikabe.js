@@ -377,10 +377,10 @@
       this.solve_u86wag$ = Kotlin.isType(tmp$2 = document.getElementById('solve'), HTMLButtonElement) ? tmp$2 : Kotlin.throwCCE();
       this.next_39onau$ = Kotlin.isType(tmp$3 = document.getElementById('next'), HTMLButtonElement) ? tmp$3 : Kotlin.throwCCE();
       this.update_cozkyo$ = Kotlin.isType(tmp$4 = document.getElementById('update'), HTMLButtonElement) ? tmp$4 : Kotlin.throwCCE();
-      this.fail_39tuiz$ = Kotlin.isType(tmp$5 = document.getElementById('notsolved'), HTMLParagraphElement) ? tmp$5 : Kotlin.throwCCE();
+      this.fail_39tuiz$ = Kotlin.isType(tmp$5 = document.getElementById('notsolved'), HTMLElement) ? tmp$5 : Kotlin.throwCCE();
       this.table_u7w961$ = Kotlin.isType(tmp$6 = document.getElementById('board'), HTMLTableElement) ? tmp$6 : Kotlin.throwCCE();
       this.tbody_u7vcpt$ = Kotlin.isType(tmp$7 = this.table_u7w961$.tBodies[0], HTMLTableSectionElement) ? tmp$7 : Kotlin.throwCCE();
-      this.debug_ugmehw$ = Kotlin.isType(tmp$8 = document.getElementById('debug'), HTMLParagraphElement) ? tmp$8 : Kotlin.throwCCE();
+      this.debug_ugmehw$ = Kotlin.isType(tmp$8 = document.getElementById('debug'), HTMLElement) ? tmp$8 : Kotlin.throwCCE();
       this.board = _.Board_init_qt1joh$(this.rows, this.columns, 0);
       this.dirty_ugjip1$ = false;
       this.table_u7w961$.ondblclick = _.Nurikabe.Nurikabe$f;
@@ -396,6 +396,8 @@
       var button = _.Nurikabe.Nurikabe$button(counter, this, solver);
       button.call(this.debug_ugmehw$, 'Next step', false, _.Nurikabe.Nurikabe$f_5);
       button.call(this.debug_ugmehw$, 'Apply all', false, _.Nurikabe.Nurikabe$f_6(solver));
+      Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this.debug_ugmehw$, 'button', void 0, _.Nurikabe.Nurikabe$f_7(this));
+      document.addEventListener('paste', _.Nurikabe.Nurikabe$f_8(this));
     }, /** @lends _.Nurikabe.prototype */ {
       rows: {
         get: function () {
@@ -600,6 +602,26 @@
       Nurikabe$f_6: function (closure$solver) {
         return function () {
           closure$solver.v.currentState.applyAll_6taknv$();
+        };
+      },
+      f_4: function (this$Nurikabe) {
+        return function (it) {
+          _.putInClipboard_3ucpiw$(this$Nurikabe.board);
+        };
+      },
+      Nurikabe$f_7: function (this$Nurikabe) {
+        return function () {
+          this.textContent = 'Copy';
+          Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this, void 0, _.Nurikabe.f_4(this$Nurikabe));
+        };
+      },
+      Nurikabe$f_8: function (this$Nurikabe) {
+        return function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var data = e.clipboardData.getData('text/plain');
+          this$Nurikabe.loadBoard_dvdyvu$(_.parse_61zpoe$(data));
+          this$Nurikabe.refresh();
         };
       }
     }),
@@ -1459,6 +1481,50 @@
     fill_m7i36t$: function ($receiver, p, color) {
       var toReplace = $receiver.get_bunuun$(p);
       return _.fill_ulgjb3$($receiver, p.first, p.second, color, _.fill_m7i36t$f(toReplace));
+    },
+    putInClipboard_3ucpiw$f: function (closure$string) {
+      return function (e) {
+        var s = closure$string;
+        {
+          e.clipboardData.setData('text/plain', s);
+          e.preventDefault();
+        }
+      };
+    },
+    putInClipboard_3ucpiw$: function ($receiver) {
+      var string = $receiver.columns.toString() + ' ' + $receiver.rows + ' ' + Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$($receiver, ' ');
+      var listener = _.putInClipboard_3ucpiw$f(string);
+      document.addEventListener('copy', listener);
+      document.execCommand('copy');
+      document.removeEventListener('copy', listener);
+    },
+    parse_61zpoe$: function (string) {
+      var tmp$0;
+      var numbers = Kotlin.modules['stdlib'].kotlin.text.replace_dn5w6f$(string, ',', '');
+      var regex = Kotlin.modules['stdlib'].kotlin.text.Regex_61zpoe$('-?[0-9]+');
+      var $receiver = Kotlin.modules['stdlib'].kotlin.sequences.toList_uya9q7$(regex.findAll_905azu$(numbers));
+      var destination = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault($receiver, 10));
+      var tmp$1;
+      tmp$1 = $receiver.iterator();
+      while (tmp$1.hasNext()) {
+        var item = tmp$1.next();
+        destination.add_za3rmp$(item.value);
+      }
+      var matches = destination;
+      var tmp$3;
+      tmp$3 = matches.iterator();
+      while (tmp$3.hasNext()) {
+        var element = tmp$3.next();
+        Kotlin.println(element);
+      }
+      var cols = parseInt(matches.get_za3lpa$(0));
+      var rows = parseInt(matches.get_za3lpa$(1));
+      Kotlin.println(cols.toString() + ' x ' + rows);
+      var board = _.Board_init_qt1joh$(rows, cols, 0);
+      tmp$0 = board.size - 1;
+      for (var i = 0; i <= tmp$0; i++)
+        board.set_vux3hl$(i, parseInt(matches.get_za3lpa$(i + 2)));
+      return board;
     }
   });
   Kotlin.defineModule('nurikabe', _);

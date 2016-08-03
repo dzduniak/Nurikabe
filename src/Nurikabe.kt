@@ -10,10 +10,10 @@ class Nurikabe() {
     private val solve = document.getElementById("solve") as HTMLButtonElement
     private val next = document.getElementById("next") as HTMLButtonElement
     private val update = document.getElementById("update") as HTMLButtonElement
-    private val fail = document.getElementById("notsolved") as HTMLParagraphElement
+    private val fail = document.getElementById("notsolved") as HTMLElement
     private val table = document.getElementById("board") as HTMLTableElement
     private var tbody = table.tBodies[0] as HTMLTableSectionElement
-    private val debug = document.getElementById("debug") as HTMLParagraphElement
+    private val debug = document.getElementById("debug") as HTMLElement
 
     val rows: Int
         get() = rowsInput.valueAsNumber.floor()
@@ -59,7 +59,7 @@ class Nurikabe() {
 
     private var dirty: Boolean = false
     private fun refresh() {
-        dirty = true;
+        dirty = true
         val cells = tbody.getElementsByTagName("td")
         board.forEachIndexed { i, v ->
             val cell = cells[i] as HTMLElement
@@ -154,7 +154,7 @@ class Nurikabe() {
         next.onClick { solve(true) }
 
         var counter = 0
-        fun HTMLParagraphElement.button(string: String = "Technique", index: Boolean = true, a: Solver.() -> Unit) {
+        fun HTMLElement.button(string: String = "Technique", index: Boolean = true, a: Solver.() -> Unit) {
             this.addElement("button") {
                 textContent = if (index) "$string $counter" else string
                 onClick {
@@ -172,6 +172,17 @@ class Nurikabe() {
 
         debug.button("Next step", false) { nextStep() }
         debug.button("Apply all", false) { solver.currentState.applyAll() }
+        debug.addElement("button") { textContent = "Copy"; onClick { board.putInClipboard() } }
+
+        document.addEventListener("paste", { e ->
+            e.preventDefault()
+            e.stopPropagation()
+
+            val data = js("e.clipboardData.getData('text/plain');")
+            loadBoard(parse(data))
+            refresh()
+        })
+
         /*debug.button { techn0() }
         debug.button { techn1() }
         debug.button { techn2() }
