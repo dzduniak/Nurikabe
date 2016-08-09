@@ -95,6 +95,9 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
                 triedBefore += it
                 val state = this.copy(firstHungry, triedBefore)
                 state.paintNumber(it, firstHungry)
+                if (hungry.size == 1) {
+                    paintBlack(it)
+                }
                 state
             }
             result.add(state)
@@ -199,16 +202,41 @@ class SolverState(val board: Board<Int>, val numbers: List<PositionValue<Int>>,
         return count == 0
     }
 
-    fun fillNumbers() {
-        numbers.forEachIndexed { i, n ->
-            val filled = board.fill(n.position, i) { it == i || it == DOT }
-            toGo[i] = n.value - filled
-            //trace(toGo)
-            if (toGo[i] < 0) {
+    private fun fillNumber(n: Int): Int {
+        var filled = 0
+
+        val position = numbers[n].position
+        board.depthFirst(position) {
+            if (it.value == BLACK || it.value == YELLOW)
+                return@depthFirst false
+
+            if (it.value != DOT && it.value != n) {
                 fail = true
                 trace("Fail fill numbers")
-                return
+                return@depthFirst false
             }
+
+            board[it.position] = n
+            filled++
+
+            return@depthFirst it.value == n || it.value == DOT
+        }
+
+        toGo[n] = numbers[n].value - filled
+        if (toGo[n] < 0) {
+            fail = true
+            trace("Fail fill numbers")
+        }
+
+        return filled
+    }
+
+    fun fillNumbers() {
+        numbers.forEachIndexed { i, n ->
+            fillNumber(i)
+
+            if (fail)
+                return
         }
     }
 

@@ -21,16 +21,26 @@ fun Board<Int>.fill(x: Int, y: Int, color: Int, toReplace: (Int) -> Boolean): In
 }
 
 fun Board<Int>.fill(p: Pair<Int, Int>, color: Int, toReplace: (Int) -> Boolean): Int {
-    return fill(p.first,  p.second, color, toReplace)
+    return fill(p.first, p.second, color, toReplace)
 }
 
 fun Board<Int>.fill(p: Pair<Int, Int>, color: Int): Int {
     val toReplace = this[p]
-    return fill(p.first,  p.second, color) { it == toReplace }
+    return fill(p.first, p.second, color) { it == toReplace }
 }
 
 fun Board<Int>.putInClipboard() {
-    val string = "${this.columns} ${this.rows} " + this.joinToString(separator = " ")
+    val string = this.rowsList.joinToString(separator = "\r\n") {
+        it.joinToString(separator = " ") {
+            when (it) {
+                BLACK -> "#"
+                YELLOW -> "?"
+                DOT -> "."
+                0 -> "_"
+                else -> it.toString()
+            }
+        }
+    }
     val listener: (Event) -> Unit = { e ->
         @Suppress("UNUSED_VARIABLE")
         val s = string
@@ -42,18 +52,21 @@ fun Board<Int>.putInClipboard() {
 }
 
 fun parse(string: String): Board<Int> {
-    val numbers = string.replace(",", "")
-    val regex = Regex("""-?[0-9]+""")
-    val matches = regex.findAll(numbers).toList().map { it.value }
-    val cols = parseInt(matches[0])
-    val rows = parseInt(matches[1])
+    val lines = string.split(Regex("""\r?\n"""))
+    val numbers = lines.map { it.split(" ") }
 
-    if (cols * rows != matches.size - 2)
-        throw Exception()
-
-    val board = Board(rows, cols, 0)
-    for (i in 0..board.size - 1)
-        board[i] = parseInt(matches[i + 2])
+    val board = Board(lines.size, numbers.first().size, 0)
+    for (y in 0..board.rows - 1)
+        for (x in 0..board.columns - 1) {
+            val value = numbers[y][x]
+            board[x, y] = when (value) {
+                "#" -> BLACK
+                "?" -> YELLOW
+                "." -> DOT
+                "_" -> 0
+                else -> parseInt(value)
+            }
+        }
 
     return board
 }

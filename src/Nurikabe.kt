@@ -1,13 +1,35 @@
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLTableElement
-import org.w3c.dom.HTMLTableRowElement
-import org.w3c.dom.HTMLTableSectionElement
+import org.w3c.dom.*
 import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
+import kotlin.dom.appendText
 import kotlin.dom.build.addElement
 import kotlin.dom.onClick
+
+val example5x5 = """_ 1 _ 1 _
+_ _ _ _ _
+3 _ _ _ _
+_ _ _ _ _
+3 _ _ _ 3"""
+
+val example7x7 = """_ _ _ 3 _ 1 _
+_ _ _ _ _ _ _
+2 _ _ _ _ _ _
+_ 4 _ _ _ 2 _
+_ _ _ _ _ _ 5
+_ _ _ _ _ _ _
+_ 4 _ 1 _ _ _"""
+
+val example10x10 = """_ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ 5 _ _ _
+_ _ 5 _ _ _ _ 2 _ _
+_ 3 _ 5 _ _ 1 _ _ _
+_ _ _ _ _ _ _ _ _ _
+_ _ _ _ _ _ _ _ _ _
+_ _ _ 2 _ _ 1 _ 4 _
+_ _ 3 _ _ _ _ 1 _ _
+_ _ _ 9 _ _ _ _ _ _
+_ _ _ _ _ _ _ _ _ _"""
+
 
 class Nurikabe() {
     private val rowsInput = document.getElementById("rows") as HTMLInputElement
@@ -53,6 +75,7 @@ class Nurikabe() {
                 }
             }
         }
+        refresh()
     }
 
     fun update() {
@@ -76,57 +99,6 @@ class Nurikabe() {
                 else -> "white"
             }
         }
-    }
-
-    private fun example1(): Board<Int> {
-        val board = Board(11, 9, 0)
-
-        board[0, 0] = 1
-        board[7, 0] = 1
-
-        board[1, 1] = 4
-        board[4, 1] = 1
-
-        board[8, 2] = 2
-
-        board[5, 3] = 9
-
-        board[1, 5] = 11
-        board[7, 5] = 3
-
-        board[6, 7] = 1
-
-        board[3, 8] = 1
-        board[7, 8] = 2
-
-        board[0, 9] = 9
-
-        board[8, 10] = 1
-        return board
-    }
-
-    private fun example2(): Board<Int> {
-        val board = Board(11, 9, 0)
-
-        board[7, 0] = 2
-
-        board[0, 1] = 2
-        board[5, 1] = 2
-
-
-
-        board[1, 4] = 38
-        board[4, 4] = 1
-
-        board[3, 5] = 2
-
-        board[5, 6] = 3
-
-        board[4, 8] = 1
-
-        board[0, 9] = 2
-
-        return board
     }
 
     init {
@@ -158,7 +130,6 @@ class Nurikabe() {
         solve.onClick { solve() }
         next.onClick { solve(true) }
 
-        var counter = 0
         fun HTMLElement.button(string: String, a: Solver.() -> Unit) {
             this.addElement("button") {
                 textContent = string
@@ -172,7 +143,6 @@ class Nurikabe() {
                 }
             }
             this.addElement("div") { className = "divider" }
-            counter++
         }
 
         val showDebug = document.getElementById("showdebug") as HTMLElement
@@ -206,5 +176,29 @@ class Nurikabe() {
                 trace("Couldn't load board.")
             }
         })
+
+        val examples = document.getElementById("examples") as HTMLElement
+        fun addExample(string: String, action: () -> Unit) {
+            examples.addElement("a") {
+                this as HTMLAnchorElement
+                textContent = string
+                href = "index.html"
+                onClick { e ->
+                    e.preventDefault()
+                    action()
+                }
+            }
+        }
+        addExample("5x5") {
+            loadBoard(parse(example5x5))
+        }
+        examples.appendText(", ")
+        addExample("7x7") {
+            loadBoard(parse(example7x7))
+        }
+        examples.appendText(", ")
+        addExample("10x10") {
+            loadBoard(parse(example10x10))
+        }
     }
 }
