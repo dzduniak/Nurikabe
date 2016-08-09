@@ -1,6 +1,9 @@
 (function (Kotlin) {
   'use strict';
   var _ = Kotlin.defineRootPackage(function () {
+    this.example5x5 = '_ 1 _ 1 _\n_ _ _ _ _\n3 _ _ _ _\n_ _ _ _ _\n3 _ _ _ 3';
+    this.example7x7 = '_ _ _ 3 _ 1 _\n_ _ _ _ _ _ _\n2 _ _ _ _ _ _\n_ 4 _ _ _ 2 _\n_ _ _ _ _ _ 5\n_ _ _ _ _ _ _\n_ 4 _ 1 _ _ _';
+    this.example10x10 = '_ _ _ _ _ _ _ _ _ _\n_ _ _ _ _ _ 5 _ _ _\n_ _ 5 _ _ _ _ 2 _ _\n_ 3 _ 5 _ _ 1 _ _ _\n_ _ _ _ _ _ _ _ _ _\n_ _ _ _ _ _ _ _ _ _\n_ _ _ 2 _ _ 1 _ 4 _\n_ _ 3 _ _ _ _ 1 _ _\n_ _ _ 9 _ _ _ _ _ _\n_ _ _ _ _ _ _ _ _ _';
     this.BLACK = -1;
     this.YELLOW = -2;
     this.DOT = -3;
@@ -371,7 +374,7 @@
       new _.Nurikabe();
     },
     Nurikabe: Kotlin.createClass(null, function () {
-      var tmp$0, tmp$1, tmp$2, tmp$3, tmp$4, tmp$5, tmp$6, tmp$7, tmp$8, tmp$9;
+      var tmp$0, tmp$1, tmp$2, tmp$3, tmp$4, tmp$5, tmp$6, tmp$7, tmp$8, tmp$9, tmp$10;
       this.rowsInput_9llf0m$ = Kotlin.isType(tmp$0 = document.getElementById('rows'), HTMLInputElement) ? tmp$0 : Kotlin.throwCCE();
       this.columnsInput_v312bg$ = Kotlin.isType(tmp$1 = document.getElementById('columns'), HTMLInputElement) ? tmp$1 : Kotlin.throwCCE();
       this.solve_u86wag$ = Kotlin.isType(tmp$2 = document.getElementById('solve'), HTMLButtonElement) ? tmp$2 : Kotlin.throwCCE();
@@ -392,8 +395,7 @@
       var solve = _.Nurikabe.Nurikabe$solve(this, solver);
       Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this.solve_u86wag$, void 0, _.Nurikabe.Nurikabe$f_3(solve));
       Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this.next_39onau$, void 0, _.Nurikabe.Nurikabe$f_4(solve));
-      var counter = {v: 0};
-      var button = _.Nurikabe.Nurikabe$button(this, solver, counter);
+      var button = _.Nurikabe.Nurikabe$button(this, solver);
       var showDebug = Kotlin.isType(tmp$9 = document.getElementById('showdebug'), HTMLElement) ? tmp$9 : Kotlin.throwCCE();
       Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(showDebug, void 0, _.Nurikabe.Nurikabe$f_5(this, showDebug));
       button.call(this.debug_ugmehw$, 'Next step', _.Nurikabe.Nurikabe$f_6);
@@ -408,6 +410,13 @@
       button.call(this.debug_ugmehw$, 'Apply all', _.Nurikabe.Nurikabe$f_15(solver));
       Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this.debug_ugmehw$, 'button', void 0, _.Nurikabe.Nurikabe$f_16(this));
       document.addEventListener('paste', _.Nurikabe.Nurikabe$f_17(this));
+      var examples = Kotlin.isType(tmp$10 = document.getElementById('examples'), HTMLElement) ? tmp$10 : Kotlin.throwCCE();
+      var addExample = _.Nurikabe.Nurikabe$addExample(examples);
+      addExample('5x5', _.Nurikabe.Nurikabe$f_18(this));
+      Kotlin.modules['stdlib'].kotlin.dom.appendText_esmrqt$(examples, ', ');
+      addExample('7x7', _.Nurikabe.Nurikabe$f_19(this));
+      Kotlin.modules['stdlib'].kotlin.dom.appendText_esmrqt$(examples, ', ');
+      addExample('10x10', _.Nurikabe.Nurikabe$f_20(this));
     }, /** @lends _.Nurikabe.prototype */ {
       rows: {
         get: function () {
@@ -446,6 +455,7 @@
             td.onmouseup = _.Nurikabe.f_1(board, x, y, this);
           }
         }
+        this.refresh();
       },
       update: function () {
         this.loadBoard_dvdyvu$(_.Board_init_qt1joh$(this.rows, this.columns, 0));
@@ -474,36 +484,6 @@
             tmp$1 = 'white';
           tmp$2.className = tmp$1;
         }
-      },
-      example1: function () {
-        var board = _.Board_init_qt1joh$(11, 9, 0);
-        board.set_qt1joh$(0, 0, 1);
-        board.set_qt1joh$(7, 0, 1);
-        board.set_qt1joh$(1, 1, 4);
-        board.set_qt1joh$(4, 1, 1);
-        board.set_qt1joh$(8, 2, 2);
-        board.set_qt1joh$(5, 3, 9);
-        board.set_qt1joh$(1, 5, 11);
-        board.set_qt1joh$(7, 5, 3);
-        board.set_qt1joh$(6, 7, 1);
-        board.set_qt1joh$(3, 8, 1);
-        board.set_qt1joh$(7, 8, 2);
-        board.set_qt1joh$(0, 9, 9);
-        board.set_qt1joh$(8, 10, 1);
-        return board;
-      },
-      example2: function () {
-        var board = _.Board_init_qt1joh$(11, 9, 0);
-        board.set_qt1joh$(7, 0, 2);
-        board.set_qt1joh$(0, 1, 2);
-        board.set_qt1joh$(5, 1, 2);
-        board.set_qt1joh$(1, 4, 38);
-        board.set_qt1joh$(4, 4, 1);
-        board.set_qt1joh$(3, 5, 2);
-        board.set_qt1joh$(5, 6, 3);
-        board.set_qt1joh$(4, 8, 1);
-        board.set_qt1joh$(0, 9, 2);
-        return board;
       }
     }, /** @lends _.Nurikabe */ {
       f: function () {
@@ -595,11 +575,10 @@
       button$f_0: function () {
         this.className = 'divider';
       },
-      Nurikabe$button: function (this$Nurikabe, closure$solver, closure$counter) {
+      Nurikabe$button: function (this$Nurikabe, closure$solver) {
         return function (string, a) {
           Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this, 'button', void 0, _.Nurikabe.button$f(string, this$Nurikabe, closure$solver, a));
           Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(this, 'div', void 0, _.Nurikabe.button$f_0);
-          closure$counter.v++;
         };
       },
       Nurikabe$f_5: function (this$Nurikabe, closure$showDebug) {
@@ -684,6 +663,41 @@
              else
               throw e_0;
           }
+        };
+      },
+      f_5: function (closure$action) {
+        return function (e) {
+          e.preventDefault();
+          closure$action();
+        };
+      },
+      addExample$f: function (closure$string, closure$action) {
+        return function () {
+          var tmp$0;
+          Kotlin.isType(tmp$0 = this, HTMLAnchorElement) ? tmp$0 : Kotlin.throwCCE();
+          this.textContent = closure$string;
+          this.href = 'index.html';
+          Kotlin.modules['stdlib'].kotlin.dom.onClick_g2lu80$(this, void 0, _.Nurikabe.f_5(closure$action));
+        };
+      },
+      Nurikabe$addExample: function (closure$examples) {
+        return function (string, action) {
+          Kotlin.modules['stdlib'].kotlin.dom.build.addElement_hart3b$(closure$examples, 'a', void 0, _.Nurikabe.addExample$f(string, action));
+        };
+      },
+      Nurikabe$f_18: function (this$Nurikabe) {
+        return function () {
+          this$Nurikabe.loadBoard_dvdyvu$(_.parse_61zpoe$(_.example5x5));
+        };
+      },
+      Nurikabe$f_19: function (this$Nurikabe) {
+        return function () {
+          this$Nurikabe.loadBoard_dvdyvu$(_.parse_61zpoe$(_.example7x7));
+        };
+      },
+      Nurikabe$f_20: function (this$Nurikabe) {
+        return function () {
+          this$Nurikabe.loadBoard_dvdyvu$(_.parse_61zpoe$(_.example10x10));
         };
       }
     }),
@@ -894,7 +908,7 @@
         tmp$8 = destination_1.iterator();
         while (tmp$8.hasNext()) {
           var element_3 = tmp$8.next();
-          var state = Kotlin.modules['stdlib'].kotlin.lazy_un3fny$(_.SolverState.f_0(element_3, triedBefore, this, firstHungry));
+          var state = Kotlin.modules['stdlib'].kotlin.lazy_un3fny$(_.SolverState.f_0(element_3, triedBefore, this, firstHungry, hungry));
           result.add_za3rmp$(state);
         }
         return result;
@@ -977,20 +991,26 @@
         this.board.depthFirst_j3dvhl$(x, y, _.SolverState.connected$f_0(count));
         return count.v === 0;
       },
+      fillNumber: function (n) {
+        var filled = {v: 0};
+        var position = this.numbers.get_za3lpa$(n).position;
+        this.board.depthFirst_kn0zno$(position, _.SolverState.fillNumber$f(n, this, filled));
+        this.toGo.set_vux3hl$(n, this.numbers.get_za3lpa$(n).value - filled.v);
+        if (this.toGo.get_za3lpa$(n) < 0) {
+          this.fail = true;
+          _.trace_za3rmp$('Fail fill numbers');
+        }
+        return filled.v;
+      },
       fillNumbers: function () {
         var tmp$0;
         var index = 0;
         tmp$0 = this.numbers.iterator();
         while (tmp$0.hasNext()) {
           var item = tmp$0.next();
-          var i = index++;
-          var filled = _.fill_h8kx0c$(this.board, item.position, i, _.SolverState.f_1(i));
-          this.toGo.set_vux3hl$(i, item.value - filled);
-          if (this.toGo.get_za3lpa$(i) < 0) {
-            this.fail = true;
-            _.trace_za3rmp$('Fail fill numbers');
+          this.fillNumber(index++);
+          if (this.fail)
             return;
-          }
         }
       },
       paintBlack: function (p) {
@@ -1267,7 +1287,7 @@
             var p = element.position;
             var c = {v: count.v};
             this.board.set_av77s6$(p, _.DOT);
-            this.board.depthFirst_kn0zno$(first.position, _.SolverState.f_12(c));
+            this.board.depthFirst_kn0zno$(first.position, _.SolverState.f_11(c));
             if (c.v !== 0) {
               if (this.paintBlack(p)) {
                 changes.v++;
@@ -1349,11 +1369,14 @@
       nextStep$f: function (it) {
         return it.position;
       },
-      f_0: function (closure$it, closure$triedBefore, this$SolverState, closure$firstHungry) {
+      f_0: function (closure$it, closure$triedBefore, this$SolverState, closure$firstHungry, closure$hungry) {
         return function () {
           Kotlin.modules['stdlib'].kotlin.collections.plusAssign_4kvzvw$(closure$triedBefore, closure$it);
           var state = this$SolverState.copy_8mkkoj$(closure$firstHungry, closure$triedBefore);
           state.paintNumber_av71ur$(closure$it, closure$firstHungry);
+          if (closure$hungry.size === 1) {
+            this$SolverState.paintBlack(closure$it);
+          }
           return state;
         };
       },
@@ -1407,12 +1430,21 @@
           return _.isBlackOrYellow_s8ev3o$(it.value);
         };
       },
-      f_1: function (closure$i) {
+      fillNumber$f: function (closure$n, this$SolverState, closure$filled) {
         return function (it) {
-          return it === closure$i || it === _.DOT;
+          if (it.value === _.BLACK || it.value === _.YELLOW)
+            return false;
+          if (it.value !== _.DOT && it.value !== closure$n) {
+            this$SolverState.fail = true;
+            _.trace_za3rmp$('Fail fill numbers');
+            return false;
+          }
+          this$SolverState.board.set_av77s6$(it.position, closure$n);
+          closure$filled.v++;
+          return it.value === closure$n || it.value === _.DOT;
         };
       },
-      f_12: function (closure$c) {
+      f_11: function (closure$c) {
         return function (it) {
           if (_.isBlackOrYellow_s8ev3o$(it.value)) {
             if (it.value === _.BLACK)
@@ -1544,7 +1576,22 @@
       var toReplace = $receiver.get_bunuun$(p);
       return _.fill_ulgjb3$($receiver, p.first, p.second, color, _.fill_m7i36t$f(toReplace));
     },
-    putInClipboard_3ucpiw$f: function (closure$string) {
+    f: function (it) {
+      if (it === _.BLACK)
+        return '#';
+      else if (it === _.YELLOW)
+        return '?';
+      else if (it === _.DOT)
+        return '.';
+      else if (it === 0)
+        return '_';
+      else
+        return it.toString();
+    },
+    putInClipboard_3ucpiw$f: function (it) {
+      return Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$(it, ' ', void 0, void 0, void 0, void 0, _.f);
+    },
+    putInClipboard_3ucpiw$f_0: function (closure$string) {
       return function (e) {
         var s = closure$string;
         {
@@ -1554,33 +1601,47 @@
       };
     },
     putInClipboard_3ucpiw$: function ($receiver) {
-      var string = $receiver.columns.toString() + ' ' + $receiver.rows + ' ' + Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$($receiver, ' ');
-      var listener = _.putInClipboard_3ucpiw$f(string);
+      var string = Kotlin.modules['stdlib'].kotlin.collections.joinToString_ld60a2$($receiver.rowsList, '\r\n', void 0, void 0, void 0, void 0, _.putInClipboard_3ucpiw$f);
+      var listener = _.putInClipboard_3ucpiw$f_0(string);
       document.addEventListener('copy', listener);
       document.execCommand('copy');
       document.removeEventListener('copy', listener);
     },
     parse_61zpoe$: function (string) {
-      var tmp$0;
-      var numbers = Kotlin.modules['stdlib'].kotlin.text.replace_dn5w6f$(string, ',', '');
-      var regex = Kotlin.modules['stdlib'].kotlin.text.Regex_61zpoe$('-?[0-9]+');
-      var $receiver = Kotlin.modules['stdlib'].kotlin.sequences.toList_uya9q7$(regex.findAll_905azu$(numbers));
-      var destination = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault($receiver, 10));
-      var tmp$1;
-      tmp$1 = $receiver.iterator();
-      while (tmp$1.hasNext()) {
-        var item = tmp$1.next();
-        destination.add_za3rmp$(item.value);
+      var tmp$0, tmp$1, tmp$2;
+      var regex = Kotlin.modules['stdlib'].kotlin.text.Regex_61zpoe$('\\r?\\n');
+      var limit;
+      if (limit === void 0) {
+        limit = 0;
       }
-      var matches = destination;
-      var cols = parseInt(matches.get_za3lpa$(0));
-      var rows = parseInt(matches.get_za3lpa$(1));
-      if (cols * rows !== matches.size - 2)
-        throw new Kotlin.Exception();
-      var board = _.Board_init_qt1joh$(rows, cols, 0);
-      tmp$0 = board.size - 1;
-      for (var i = 0; i <= tmp$0; i++)
-        board.set_vux3hl$(i, parseInt(matches.get_za3lpa$(i + 2)));
+      var lines = regex.split_905azu$(string, limit);
+      var destination = new Kotlin.ArrayList(Kotlin.modules['stdlib'].kotlin.collections.collectionSizeOrDefault(lines, 10));
+      var tmp$3;
+      tmp$3 = lines.iterator();
+      while (tmp$3.hasNext()) {
+        var item = tmp$3.next();
+        destination.add_za3rmp$(Kotlin.modules['stdlib'].kotlin.text.split_l2gz7$(item, [' ']));
+      }
+      var numbers = destination;
+      var board = _.Board_init_qt1joh$(lines.size, Kotlin.modules['stdlib'].kotlin.collections.first_a7ptmv$(numbers).size, 0);
+      tmp$0 = board.rows - 1;
+      for (var y = 0; y <= tmp$0; y++) {
+        tmp$1 = board.columns - 1;
+        for (var x = 0; x <= tmp$1; x++) {
+          var value = numbers.get_za3lpa$(y).get_za3lpa$(x);
+          if (Kotlin.equals(value, '#'))
+            tmp$2 = _.BLACK;
+          else if (Kotlin.equals(value, '?'))
+            tmp$2 = _.YELLOW;
+          else if (Kotlin.equals(value, '.'))
+            tmp$2 = _.DOT;
+          else if (Kotlin.equals(value, '_'))
+            tmp$2 = 0;
+          else
+            tmp$2 = parseInt(value);
+          board.set_qt1joh$(x, y, tmp$2);
+        }
+      }
       return board;
     }
   });
