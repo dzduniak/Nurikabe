@@ -1,4 +1,4 @@
-# Nurikabe
+# nurikabe
 Nurikabe solver made in Kotlin.
 
 You can test it online here:  http://dzduniak.github.io/Nurikabe/
